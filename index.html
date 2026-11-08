@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Trends Dashboard – Netwerk Mediawijsheid</title>
+<title>Week van de Mediawijsheid 2026 monitor – Netwerk Mediawijsheid</title>
 <meta name="description" content="Hoe leeft de Week van de Mediawijsheid in het land? Vermeldingen op websites en social media, dagelijks bijgewerkt.">
 <link rel="icon" href="assets/logo.svg">
 <style>
@@ -16,7 +16,7 @@
   @media (prefers-reduced-motion: reduce) { .dash-skeleton { animation: none; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="assets/dash-shim.js?v=2026110809"></script>
+<script src="assets/dash-shim.js?v=2026110810"></script>
 </head>
 <body>
 <div id="dash-root">
@@ -193,6 +193,30 @@
     .nm-tagrow { grid-template-columns: minmax(0, 7.5rem) 1fr 2.2rem; font-size: 15px; }
     .nm-intro .nm-line { overflow-wrap: anywhere; }
   }
+  /* v10: klikbare berichten, oplichten, titel, MediaMasters-logo, grotere schuifknop, tabelvolgorde */
+  .nm-logos { flex: none; display: flex; align-items: center; gap: 12px; }
+  .nm-mmlogo { width: 189px; height: 92px; }
+  .nm-ticker::-webkit-scrollbar-thumb, .nm-tablebox::-webkit-scrollbar-thumb { min-height: 60px; }
+  .nm-recent::-webkit-scrollbar-thumb { min-width: 60px; }
+  .nm-kaart, .nm-trow, .nm-table tbody tr { cursor: pointer; }
+  .nm-kaart { transition: background-color .12s ease, box-shadow .12s ease, transform .12s ease; }
+  .nm-recent { padding-top: 4px; }
+  .nm-recent .nm-kaart:hover, .nm-kaart:hover { background: rgba(52,59,72,.92); box-shadow: 0 0 0 1px rgba(255,255,255,.28), 0 8px 22px rgba(0,0,0,.35); transform: translateY(-2px); }
+  .nm-trow { border-radius: 8px; transition: background-color .12s ease; }
+  .nm-trow:hover { background: rgba(255,255,255,.09); }
+  .nm-trow .nm-ttile { transition: transform .12s ease; }
+  .nm-trow:hover .nm-ttile { transform: scale(1.06); }
+  .nm-table tbody td { transition: background-color .12s ease; }
+  .nm-table tbody tr:hover td { background: rgba(255,255,255,.08); }
+  .nm-table td:first-child { white-space: normal; font-variant-numeric: normal; }
+  .nm-table .nm-c-datum { white-space: nowrap; font-variant-numeric: tabular-nums; padding-right: 4px; }
+  .nm-table .nm-c-kanaal { white-space: nowrap; padding-left: 4px; }
+  .nm-table .nm-c-kanaal, .nm-table .nm-hide { width: 1%; white-space: nowrap; }
+  .nm-table .nm-c-datum { width: 1%; min-width: 6.4em; white-space: normal; }
+  @media (min-width: 641px) { .nm-table th:nth-child(2) { width: 24%; } }
+  @media (prefers-reduced-motion: reduce) { .nm-kaart, .nm-trow, .nm-trow .nm-ttile, .nm-table tbody td { transition: none; } .nm-recent .nm-kaart:hover, .nm-kaart:hover, .nm-trow:hover .nm-ttile { transform: none; } }
+  @media (max-width: 760px) { .nm-bg { background-position: 84% top; } }
+  @media (max-width: 640px) { .nm-logos { gap: 10px; } .nm-mmlogo { width: 111px; height: 54px; } }
   [data-dash-source-state=empty] { color: transparent; }
   [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
 </style>
@@ -203,7 +227,7 @@
     <div class="nm-brand">
       <span class="nm-logo" role="img" aria-label="Netwerk Mediawijsheid" data-draw="logo" data-source="logo"></span>
       <span class="nm-divider"></span>
-      <h1>Trends Dashboard</h1>
+      <h1 class="nm-titel">Week van de Mediawijsheid 2026 monitor</h1>
     </div>
     <label class="nm-pick">Onderwerp
       <select class="dash-select nm-onderwerp" aria-label="Onderwerp">
@@ -219,7 +243,10 @@
       <p class="nm-line">Drukste dag: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_datum_label">—</b>, <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_aantal">—</b> vermeldingen</p>
       <p class="nm-line"><span class="nm-fine">Deze vermeldingen kunnen foutmarges bevatten.</span></p>
     </section>
-      <span class="nm-camplogo" role="img" aria-label="Week van de Mediawijsheid 2026" data-draw="camplogo" data-source="logo_wvdm2026"></span>
+      <div class="nm-logos">
+        <span class="nm-camplogo" role="img" aria-label="Week van de Mediawijsheid 2026" data-draw="camplogo" data-source="logo_wvdm2026"></span>
+        <span class="nm-camplogo nm-mmlogo" role="img" aria-label="MediaMasters" data-draw="mmlogo" data-source="logo_mediamasters"></span>
+      </div>
     </div>
 
     <section class="nm-feed" id="berichten-feed">
@@ -277,7 +304,7 @@
 
       <section class="nm-card" id="hashtags">
         <h2>Gebruikte hashtags en tags</h2>
-        <p class="nm-note">Aantal vermeldingen per hashtag of tag. Telt vanaf de eerste zoekronde op social media. #mediawijsheid en #schermtijd tellen alleen mee als het bericht ook over de campagne gaat.</p>
+        <p class="nm-note">Aantal vermeldingen per hashtag of tag. Telt vanaf de eerste zoekronde op social media. #mediawijsheid, #schermtijd en #digitalebalans tellen alleen mee als het bericht ook over de campagne gaat.</p>
         <div class="nm-tags dash-skeleton" data-draw="hashtags" data-source="wvdm_hashtags"></div>
       </section>
     </div>
@@ -303,10 +330,10 @@
         <table class="nm-table" data-source="vermeldingen" data-row-key="id">
           <thead>
             <tr>
-              <th data-field="datum_label">Datum</th>
-              <th data-field="kanaal">Kanaal</th>
-              <th data-field="bron">Bron</th>
               <th data-field="titel">Bericht (link)</th>
+              <th data-field="bron">Bron</th>
+              <th class="nm-c-datum" data-field="datum_label">Datum</th>
+              <th class="nm-c-kanaal" data-field="kanaal">Kanaal</th>
               <th class="nm-hide" data-field="soort">Soort</th>
             </tr>
           </thead>
@@ -326,7 +353,7 @@
         <dt>Opsplitsing bovenaan</dt>
         <dd>"Week van de Mediawijsheid" en "MediaMasters" tellen samen op tot het totaal: een bericht over de game MediaMasters telt bij MediaMasters, de rest bij de Week van de Mediawijsheid. "#wvdm" telt de vermeldingen met #wvdm of #WvdM2026 en overlapt met beide.</dd>
         <dt>Hashtags en tags</dt>
-        <dd>Altijd meegeteld: #wvdm, #WvdM2026, #weekvandemediawijsheid, #gezondmetjescherm, #mediamasters, #mediamastersnl, #iedereenmediawijs, @iedereenmediawijs en @mediamastersnl. Alleen in combinatie met de campagne: #mediawijsheid en #schermtijd. Hashtags worden vooral op social media gebruikt, dus deze aantallen groeien pas als daar gezocht is.</dd>
+        <dd>Altijd meegeteld: #wvdm, #WvdM2026, #weekvandemediawijsheid, #gezondmetjescherm, #mediamasters, #mediamastersnl, #iedereenmediawijs, @iedereenmediawijs en @mediamastersnl. Alleen in combinatie met de campagne: #mediawijsheid, #schermtijd en #digitalebalans. Hashtags worden vooral op social media gebruikt, dus deze aantallen groeien pas als daar gezocht is.</dd>
         <dt>Datum</dt>
         <dd>De publicatiedatum van de pagina of post. Agenda- en informatiepagina's hebben vaak geen datum: die tellen mee in de totalen, maar niet in de grafiek per dag; in de lichtkrant staan ze achteraan.</dd>
         <dt>Meest recent en lichtkrant</dt>
@@ -342,7 +369,7 @@
   window.NM_KANALEN = ['Website', 'Instagram', 'Facebook', 'LinkedIn'];
   window.NM_ICONS = {"Instagram": "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 50 50%22 fill=%22%23fff%22%3E%3Cpath d=%22M35.5,16.21c-2.78,2.13-5.92-1.05-3.73-3.79,2.76-2.01,5.76,1.05,3.73,3.79Z%22/%3E%3Cpath d=%22M23.6,38.91c-6.3,0-11.42-5.12-11.42-11.42s5.12-11.42,11.42-11.42,11.42,5.12,11.42,11.42-5.12,11.42-11.42,11.42ZM23.6,20.07c-4.09,0-7.42,3.33-7.42,7.42s3.33,7.42,7.42,7.42,7.42-3.33,7.42-7.42-3.33-7.42-7.42-7.42Z%22/%3E%3C/svg%3E", "Facebook": "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 50 50%22 fill=%22%23fff%22%3E%3Cpath d=%22M31.1,15.63h-2.88s-1.22.05-1.22,1.46v2.8h4.09l-.33,4.75h-3.76v13.33h-5.57v-13.36h-2.82v-4.7h2.82v-3.62s-.26-1.88,1.53-3.55c0,0,1.13-1.34,3.41-1.37,0,0,.63-.02.66-.02h4.07s0,4.28,0,4.28Z%22/%3E%3C/svg%3E", "Website": "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 50 50%22 fill=%22%23fff%22%3E%3Cpath d=%22M24.85,9.86c-8.16,0-14.8,6.64-14.8,14.8s6.64,14.8,14.8,14.8,14.8-6.64,14.8-14.8-6.64-14.8-14.8-14.8ZM36.55,23.16h-4.45c-.16-3.62-.91-6.77-2.06-9.1,3.49,1.72,6.01,5.1,6.51,9.1ZM13.15,26.16h4.45c.16,3.62.91,6.77,2.06,9.1-3.49-1.72-6.01-5.1-6.51-9.1ZM17.6,23.16h-4.45c.5-4,3.02-7.38,6.51-9.1-1.15,2.33-1.9,5.48-2.06,9.1ZM25.02,36.45c-.06,0-.12,0-.17,0s-.11,0-.17,0c-1.61-.26-3.77-4.16-4.08-10.29h8.5c-.31,6.13-2.47,10.03-4.08,10.29ZM20.6,23.16c.31-6.12,2.47-10.03,4.08-10.29.06-.01.12-.01.17-.01s.11,0,.17.01c1.61.26,3.77,4.17,4.08,10.29h-8.5ZM30.04,35.26c1.15-2.33,1.9-5.48,2.06-9.1h4.45c-.5,4-3.02,7.38-6.51,9.1Z%22/%3E%3C/svg%3E", "LinkedIn": "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 50 50%22 fill=%22%23fff%22%3E%3Cpath d=%22M18.94,35.01h-4.64v-13.96h4.64v13.96ZM16.63,19.14h-.04c-1.55,0-2.56-1.07-2.56-2.41s1.04-2.41,2.63-2.41,2.56,1.04,2.59,2.41c0,1.34-1.01,2.41-2.62,2.41ZM35.68,35.01h-4.64v-7.47c0-1.87-.68-3.15-2.35-3.15-1.29,0-2.05.86-2.38,1.69-.13.3-.16.72-.16,1.13v7.8h-4.64s.06-12.65,0-13.96h4.64v1.98c.61-.95,1.71-2.31,4.18-2.31,3.06,0,5.35,2,5.35,6.29v8ZM26.15,23.07v-.04s-.02.03-.03.04h.03Z%22/%3E%3C/svg%3E"};
   window.NM_COLORS = ['#ec1162', '#f97316', '#145ecc', '#00a4ff', '#c084fc']; // Website, Instagram, Facebook, LinkedIn, MediaMasters
-  window.NM_TAGS = ['#wvdm', '#wvdm2026', '#weekvandemediawijsheid', '#gezondmetjescherm', '#mediamasters', '#mediamastersnl', '#iedereenmediawijs', '@iedereenmediawijs', '@mediamastersnl', '#mediawijsheid', '#schermtijd'];
+  window.NM_TAGS = ['#wvdm', '#wvdm2026', '#weekvandemediawijsheid', '#gezondmetjescherm', '#mediamasters', '#mediamastersnl', '#iedereenmediawijs', '@iedereenmediawijs', '@mediamastersnl', '#mediawijsheid', '#schermtijd', '#digitalebalans'];
 
   dash.calc('wvdm_per_kanaal', {
     inputs: ['vermeldingen'],
@@ -416,7 +443,7 @@
     title: 'WvdM 2026: hashtags en tags',
     description: 'Aantal vermeldingen per gevolgde hashtag of tag, van veel naar weinig.',
     fn: (vermeldingen) => {
-      const lijst = ['#wvdm', '#wvdm2026', '#weekvandemediawijsheid', '#gezondmetjescherm', '#mediamasters', '#mediamastersnl', '#iedereenmediawijs', '@iedereenmediawijs', '@mediamastersnl', '#mediawijsheid', '#schermtijd'];
+      const lijst = ['#wvdm', '#wvdm2026', '#weekvandemediawijsheid', '#gezondmetjescherm', '#mediamasters', '#mediamastersnl', '#iedereenmediawijs', '@iedereenmediawijs', '@mediamastersnl', '#mediawijsheid', '#schermtijd', '#digitalebalans'];
       const v0 = vermeldingen.filter((r) => r.onderwerp === 'Week van de Mediawijsheid 2026');
       return lijst.map((tag) => ({ tag, aantal: v0.filter((r) => String(r.hashtags || '').toLowerCase().split(/\s+/).includes(tag)).length }))
         .sort((a, b) => b.aantal - a.aantal || lijst.indexOf(a.tag) - lijst.indexOf(b.tag));
@@ -449,9 +476,38 @@
 
   document.querySelectorAll('.nm-swatch').forEach((s) => { s.style.background = window.NM_COLORS[+s.dataset.i]; });
 
-  document.querySelectorAll('.nm-onderwerp').forEach((sel) => sel.addEventListener('change', () => {
-    document.querySelectorAll('.nm-topic, .nm-bg').forEach((t) => { t.hidden = t.dataset.onderwerp !== sel.value; });
-  }));
+  window.nmTitel = (sel) => {
+    const opt = sel.options[sel.selectedIndex];
+    const naam = (opt ? opt.textContent : '').trim();
+    document.querySelectorAll('.nm-titel').forEach((h) => { h.textContent = naam ? naam + ' monitor' : 'Monitor'; });
+    try { document.title = (naam ? naam + ' monitor' : 'Monitor') + ' – Netwerk Mediawijsheid'; } catch (e) { /* titel niet aan te passen */ }
+  };
+  document.querySelectorAll('.nm-onderwerp').forEach((sel) => {
+    window.nmTitel(sel);
+    sel.addEventListener('change', () => {
+      document.querySelectorAll('.nm-topic, .nm-bg').forEach((t) => { t.hidden = t.dataset.onderwerp !== sel.value; });
+      window.nmTitel(sel);
+    });
+  });
+
+  // hele bericht klikbaar; Instagram opent op de eigen site overal de pop-up
+  window.nmIsIg = (r) => !!(window.NM_EMBED && r && r.kanaal === 'Instagram' && typeof r.url === 'string' && r.url.startsWith('https://www.instagram.com/'));
+  window.nmOpen = (r) => {
+    if (!r || typeof r.url !== 'string' || !r.url.startsWith('https://')) return;
+    if (window.nmIsIg(r)) { window.nmIgPopup(r.url); return; }
+    const a = document.createElement('a'); a.href = r.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+    document.body.append(a); a.click(); a.remove();
+  };
+  window.nmKlikbaar = (el, r) => {
+    if (!r || typeof r.url !== 'string' || !r.url.startsWith('https://')) return el;
+    el.addEventListener('click', (e) => {
+      if (e.defaultPrevented || e.target.closest('a, .nm-klik, button, input, select')) return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && String(sel).trim()) return;
+      window.nmOpen(r);
+    });
+    return el;
+  };
 
   window.nmFilter = { kanaal: '', thema: '', q: '' };
   document.querySelectorAll('.nm-kanaal').forEach((s) => s.addEventListener('change', () => { window.nmFilter.kanaal = s.value; dash.draw('tabel'); }));
@@ -485,6 +541,11 @@
   });
   dash.draw('logo', (el) => {
     const d = dash.data('logo');
+    el.style.backgroundImage = d.status === 'ok' && typeof d.data === 'string' && d.data.startsWith('data:image/') ? `url("${d.data.trim()}")` : 'none';
+  });
+
+  dash.draw('mmlogo', (el) => {
+    const d = dash.data('logo_mediamasters');
     el.style.backgroundImage = d.status === 'ok' && typeof d.data === 'string' && d.data.startsWith('data:image/') ? `url("${d.data.trim()}")` : 'none';
   });
 
@@ -548,6 +609,7 @@
     if (typeof r.url === 'string' && r.url.startsWith('https://')) { a = document.createElement('a'); a.href = r.url; a.target = '_blank'; a.rel = 'noopener noreferrer'; }
     else { a = document.createElement('span'); }
     a.className = cls; a.textContent = r.titel;
+    if (a.tagName === 'A' && window.nmIsIg && window.nmIsIg(r)) a.addEventListener('click', (e) => { e.preventDefault(); window.nmIgPopup(r.url); });
     return a;
   };
 
@@ -601,7 +663,7 @@
     const tekst = document.createElement('p'); tekst.className = 'nm-kaart-tekst'; tekst.textContent = r.samenvatting || '';
     body.append(meta, window.nmLink(r, 'nm-kaart-titel'), tekst);
     kaart.append(beeld, body);
-    return kaart;
+    return window.nmKlikbaar(kaart, r);
   };
 
   // horizontale lichtkrant met de vijftien nieuwste berichten (rustiger tempo)
@@ -711,6 +773,7 @@
           mk.title = r.kanaal || ''; mk.setAttribute('aria-label', r.kanaal || '');
           tegel.append(mk);
           row.append(tegel, body);
+          window.nmKlikbaar(row, r);
           box.append(row);
         });
         return box;
@@ -907,15 +970,15 @@
     rows.forEach((r) => {
       const tr = document.createElement('tr'); tr.dataset.key = r.id;
       const td = (txt, cls) => { const c = document.createElement('td'); if (cls) c.className = cls; c.textContent = txt == null ? '' : String(txt); tr.append(c); return c; };
-      td(r.datum_label);
-      td(r.kanaal);
-      td(r.bron);
       const c = document.createElement('td');
-      if (typeof r.url === 'string' && r.url.startsWith('https://')) {
-        const a = document.createElement('a'); a.href = r.url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = r.titel; c.append(a);
-      } else { c.textContent = r.titel; }
+      if (typeof r.url === 'string' && r.url.startsWith('https://')) c.append(window.nmLink(r, 'nm-tlink'));
+      else { c.textContent = r.titel; }
       tr.append(c);
+      td(r.bron);
+      td(r.datum_label, 'nm-c-datum');
+      td(r.kanaal, 'nm-c-kanaal');
       td(r.soort, 'nm-hide');
+      window.nmKlikbaar(tr, r);
       tb.append(tr);
     });
     leeg.forEach((p) => { p.hidden = rows.length > 0; });

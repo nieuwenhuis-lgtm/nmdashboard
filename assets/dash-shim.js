@@ -3,9 +3,10 @@
 (function () {
   const SOURCES = {
     vermeldingen: { url: 'data/vermeldingen.json', type: 'json' },
-    bg_wvdm2026: { url: 'assets/bg-wvdm2026.jpg', type: 'dataurl' },
+    bg_wvdm2026: { url: 'assets/bg-wvdm2026.jpg?v=2', type: 'dataurl' },
     logo: { url: 'assets/logo.svg', type: 'dataurl' },
     logo_wvdm2026: { url: 'assets/logo-wvdm2026.svg', type: 'dataurl' },
+    logo_mediamasters: { url: 'assets/logo-mediamasters.png', type: 'dataurl' },
     ph1: { url: 'assets/placeholder-1.jpg', type: 'dataurl' },
     ph2: { url: 'assets/placeholder-2.jpg', type: 'dataurl' },
     ph3: { url: 'assets/placeholder-3.jpg', type: 'dataurl' },
