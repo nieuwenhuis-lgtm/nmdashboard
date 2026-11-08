@@ -16,7 +16,7 @@
   @media (prefers-reduced-motion: reduce) { .dash-skeleton { animation: none; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="assets/dash-shim.js?v=2026110813"></script>
+<script src="assets/dash-shim.js?v=2026110814"></script>
 </head>
 <body>
 <div id="dash-root">
@@ -309,7 +309,7 @@
 
       <section class="nm-card" id="per-dag">
         <h2>Vermeldingen per dag</h2>
-        <p class="nm-note">26 okt t/m 13 nov, op publicatiedatum. De laatste dagen lopen achter.</p>
+        <p class="nm-note">23 okt t/m 27 nov (twee weken voor en na de campagneweek), op publicatiedatum. De laatste dagen lopen achter.</p>
         <div class="nm-legend">
           <span><i class="nm-swatch" data-i="0"></i>Websites</span>
           <span><i class="nm-swatch" data-i="1"></i>Instagram</span>
@@ -406,11 +406,11 @@
   dash.calc('wvdm_per_dag', {
     inputs: ['vermeldingen'],
     title: 'WvdM 2026: per dag',
-    description: 'Aantal vermeldingen met datum per dag en per kanaal, 26 okt t/m 13 nov 2026.',
+    description: 'Aantal vermeldingen met datum per dag en per kanaal, 23 okt t/m 27 nov 2026.',
     fn: (vermeldingen) => {
       const v0 = vermeldingen.filter((r) => r.onderwerp === 'Week van de Mediawijsheid 2026');
       const rows = [];
-      for (let t = Date.UTC(2026, 9, 26); t <= Date.UTC(2026, 10, 13); t += 864e5) {
+      for (let t = Date.UTC(2026, 9, 23); t <= Date.UTC(2026, 10, 27); t += 864e5) {
         const datum = new Date(t).toISOString().slice(0, 10);
         const r = { datum, totaal: 0 };
         for (const k of ['Website', 'Instagram', 'Facebook', 'LinkedIn']) {
