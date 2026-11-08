@@ -16,7 +16,7 @@
   @media (prefers-reduced-motion: reduce) { .dash-skeleton { animation: none; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="assets/dash-shim.js?v=2026110812"></script>
+<script src="assets/dash-shim.js?v=2026110813"></script>
 </head>
 <body>
 <div id="dash-root">
@@ -230,6 +230,10 @@
   .nm-csv-melding { font-size: 14px; color: var(--nm-muted); align-self: center; }
   @media (min-width: 761px) { .nm-bg { background-size: max(112vw, 199vh) auto; background-position: right 35%; } }
   @media (max-width: 760px) { .nm-bg { background-position: 74% top; } }
+  /* v14: lichtkranten met de muis vastpakken en slepen */
+  .nm-recent, .nm-ticker { cursor: grab; }
+  .nm-sleept, .nm-sleept * { cursor: grabbing !important; user-select: none; -webkit-user-select: none; }
+  .nm-recent img, .nm-ticker img { -webkit-user-drag: none; }
   [data-dash-source-state=empty] { color: transparent; }
   [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
 </style>
@@ -711,6 +715,40 @@
     return st;
   };
 
+  // slepen met de muis, zoals vegen op een telefoon; na slepen opent er geen bericht
+  window.nmSleep = (el, axis) => {
+    let start = null, moved = false, blokkeer = false;
+    el.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      const rect = el.getBoundingClientRect();
+      if (e.clientX - rect.left >= el.clientWidth || e.clientY - rect.top >= el.clientHeight) return; // op de schuifbalk
+      start = { x: e.clientX, y: e.clientY, s: axis === 'x' ? el.scrollLeft : el.scrollTop, id: e.pointerId };
+      moved = false;
+    });
+    el.addEventListener('pointermove', (e) => {
+      if (!start || e.pointerId !== start.id) return;
+      const d = axis === 'x' ? e.clientX - start.x : e.clientY - start.y;
+      if (!moved && Math.abs(d) > 6) {
+        moved = true; el.classList.add('nm-sleept');
+        try { el.setPointerCapture(e.pointerId); } catch (err) { /* geen vastpakken mogelijk */ }
+      }
+      if (moved) {
+        if (axis === 'x') el.scrollLeft = start.s - d; else el.scrollTop = start.s - d;
+        e.preventDefault();
+      }
+    });
+    const stop = (e) => {
+      if (!start || (e && e.pointerId !== start.id)) return;
+      if (moved) { blokkeer = true; setTimeout(() => { blokkeer = false; }, 0); }
+      start = null; moved = false; el.classList.remove('nm-sleept');
+    };
+    el.addEventListener('pointerup', stop);
+    el.addEventListener('pointercancel', stop);
+    el.addEventListener('lostpointercapture', stop);
+    el.addEventListener('click', (e) => { if (blokkeer) { e.preventDefault(); e.stopPropagation(); blokkeer = false; } }, true);
+    el.addEventListener('dragstart', (e) => e.preventDefault());
+  };
+
   window.nmKaart = (r) => {
     const kaart = document.createElement('article'); kaart.className = 'nm-kaart';
     const beeld = window.nmTile(r, 'nm-kaart-beeld');
@@ -730,7 +768,7 @@
 
   // horizontale lichtkrant met de vijftien nieuwste berichten (rustiger tempo)
   dash.draw('recent', {
-    mount: (el) => window.nmAuto(el, 'x', 15),
+    mount: (el) => { window.nmSleep(el, 'x'); return window.nmAuto(el, 'x', 15); },
     update: (el, st) => {
       const d = dash.data('wvdm_recent');
       el.replaceChildren();
@@ -764,6 +802,7 @@
   // lichtkrant: schuift automatisch, stopt bij muis/aanraking, handmatig scrollen kan
   dash.draw('ticker', {
     mount: (el) => {
+      window.nmSleep(el, 'y');
       const st = { paused: false, userUntil: 0, last: 0, prog: false, raf: 0, loop: false, pos: 0 };
       const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const SPEED = 18; // pixels per seconde
