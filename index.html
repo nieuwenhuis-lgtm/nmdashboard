@@ -16,7 +16,7 @@
   @media (prefers-reduced-motion: reduce) { .dash-skeleton { animation: none; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="assets/dash-shim.js?v=2026110810"></script>
+<script src="assets/dash-shim.js?v=2026110811"></script>
 </head>
 <body>
 <div id="dash-root">
@@ -217,6 +217,11 @@
   @media (prefers-reduced-motion: reduce) { .nm-kaart, .nm-trow, .nm-trow .nm-ttile, .nm-table tbody td { transition: none; } .nm-recent .nm-kaart:hover, .nm-kaart:hover, .nm-trow:hover .nm-ttile { transform: none; } }
   @media (max-width: 760px) { .nm-bg { background-position: 84% top; } }
   @media (max-width: 640px) { .nm-logos { gap: 10px; } .nm-mmlogo { width: 111px; height: 54px; } }
+  /* v12: Chrome en Edge gebruiken de eigen schuifbalkvormgeving (grote knop); Firefox krijgt alleen de kleuren */
+  .nm-recent, .nm-ticker, .nm-tablebox { scrollbar-width: auto; scrollbar-color: auto; }
+  @supports (-moz-appearance: none) { .nm-recent, .nm-ticker, .nm-tablebox { scrollbar-color: #5B6270 rgba(213,217,224,.55); } }
+  .nm-ticker::-webkit-scrollbar-thumb, .nm-tablebox::-webkit-scrollbar-thumb { min-height: 90px; }
+  .nm-recent::-webkit-scrollbar-thumb { min-width: 90px; }
   [data-dash-source-state=empty] { color: transparent; }
   [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
 </style>
@@ -633,8 +638,6 @@
         st.pos += SPEED * dt;
         if (st.pos >= st.half) st.pos -= st.half;
         if (Math.abs(el[P] - st.pos) >= 0.5) { st.prog = true; el[P] = st.pos; }
-      } else if (st.loop && st.half > 0 && el[P] >= st.half) {
-        st.pos = el[P] - st.half; st.prog = true; el[P] = st.pos;
       }
       st.raf = requestAnimationFrame(tick);
     };
@@ -724,8 +727,6 @@
           st.pos += SPEED * dt;
           if (st.pos >= half) st.pos -= half;
           if (Math.abs(el.scrollTop - st.pos) >= 0.5) { st.prog = true; el.scrollTop = st.pos; }
-        } else if (st.loop && el.scrollTop >= el.scrollHeight / 2) {
-          st.pos = el.scrollTop - el.scrollHeight / 2; st.prog = true; el.scrollTop = st.pos;
         }
         st.raf = requestAnimationFrame(tick);
       };
