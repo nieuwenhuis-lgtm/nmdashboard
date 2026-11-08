@@ -5,7 +5,9 @@
     vermeldingen: { url: 'data/vermeldingen.json', type: 'json' },
     bg_wvdm2026: { url: 'assets/bg-wvdm2026.jpg', type: 'dataurl' },
     logo: { url: 'assets/logo.svg', type: 'dataurl' },
+    logo_wvdm2026: { url: 'assets/logo-wvdm2026.svg', type: 'dataurl' },
   };
+  window.NM_IMAGES = true; // op de eigen site: uitgelichte afbeeldingen van websites tonen
   const VERVERS_MINUTEN = 15; // gegevens opnieuw ophalen terwijl de pagina open staat
   const store = {};
   const calcs = {};

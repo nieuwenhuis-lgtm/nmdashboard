@@ -126,6 +126,20 @@
   @media (max-width: 520px) { .nm-recent .nm-kaart { flex-basis: 260px; } }
   .nm-ticker-wrap::before { background: linear-gradient(180deg, rgba(24,28,35,.7), rgba(24,28,35,0)); }
   .nm-ticker-wrap::after { background: linear-gradient(0deg, rgba(24,28,35,.7), rgba(24,28,35,0)); }
+  /* v6: campagnelogo, foto overal zichtbaar, geen vervaging, kleinere introtekst */
+  .nm-bg { height: 100%; background-attachment: fixed; background-position: right center; }
+  .nm-bg::after { background: linear-gradient(90deg, rgba(14,17,22,.62) 0%, rgba(14,17,22,.45) 55%, rgba(14,17,22,.3) 100%); }
+  @media (max-width: 760px) { .nm-bg { height: 100%; background-attachment: scroll; background-position: 70% top; } .nm-bg::after { background: rgba(14,17,22,.55); } }
+  .nm-card, .nm-intro, .nm-feed { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .nm-feed { border-top: 1px solid var(--nm-line); }
+  .nm-introrow { display: flex; align-items: center; gap: 20px; }
+  .nm-introrow .nm-intro { flex: 1 1 auto; min-width: 0; }
+  .nm-camplogo { flex: none; width: 104px; height: 74px; background: no-repeat center / contain; }
+  @media (max-width: 640px) { .nm-introrow { flex-direction: column-reverse; align-items: flex-start; gap: 12px; } }
+  .nm-intro .nm-line { font-size: 15px; }
+  .nm-intro .nm-line .nm-fine { font-size: 13px; }
+  .nm-foto { color: transparent !important; }
+  .nm-foto .nm-letter { display: none; }
   [data-dash-source-state=empty] { color: transparent; }
   [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
 </style>
@@ -146,9 +160,12 @@
   </header>
 
   <div class="nm-topic" data-onderwerp="wvdm2026">
+    <div class="nm-introrow">
     <section class="nm-intro" id="samenvatting">
-      <p class="nm-line">Vermeldingen tot <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="stand_label">—</b>: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="totaal">—</b><span class="nm-dot">·</span>Week van de Mediawijsheid: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="wvdm_aantal">—</b><span class="nm-dot">·</span>#wvdm: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="hashtag_totaal">—</b><span class="nm-dot">·</span>MediaMasters: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="mm_totaal">—</b><span class="nm-dot">·</span>Drukste dag: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_datum_label">—</b>, <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_aantal">—</b> vermeldingen<span class="nm-dot">·</span>Drukste dag #wvdm: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="hashtag_piek_datum_label">—</b>, <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="hashtag_piek_aantal">—</b> vermeldingen<span class="nm-dot">·</span><span class="nm-fine">Deze vermeldingen kunnen foutmarges bevatten.</span></p>
+      <p class="nm-line">Vermeldingen tot <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="stand_label">—</b>: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="totaal">—</b><span class="nm-dot">·</span>Week van de Mediawijsheid: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="wvdm_aantal">—</b><span class="nm-dot">·</span>#wvdm: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="hashtag_totaal">—</b><span class="nm-dot">·</span>MediaMasters: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="mm_totaal">—</b><span class="nm-dot">·</span>Drukste dag: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_datum_label">—</b>, <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_aantal">—</b> vermeldingen<span class="nm-dot">·</span><span class="nm-fine">Deze vermeldingen kunnen foutmarges bevatten.</span></p>
     </section>
+      <span class="nm-camplogo" role="img" aria-label="Week van de Mediawijsheid 2026" data-draw="camplogo" data-source="logo_wvdm2026"></span>
+    </div>
 
     <section class="nm-feed" id="berichten-feed">
       <h2>Meest recent</h2>
@@ -358,7 +375,7 @@
       .filter((r) => r.onderwerp === 'Week van de Mediawijsheid 2026' && r.datum && r.soort !== 'Doorplaatsing')
       .sort((a, b) => b.datum.localeCompare(a.datum) || b.id.localeCompare(a.id))
       .slice(0, 15)
-      .map((r) => ({ id: r.id, datum_label: r.datum_label, kanaal: r.kanaal, bron: r.bron, titel: r.titel, samenvatting: r.samenvatting, url: r.url })),
+      .map((r) => ({ id: r.id, datum_label: r.datum_label, kanaal: r.kanaal, bron: r.bron, titel: r.titel, samenvatting: r.samenvatting, url: r.url, afbeelding: r.afbeelding || '' })),
   });
 
   dash.calc('wvdm_overig', {
@@ -370,7 +387,7 @@
       return vermeldingen
         .filter((r) => r.onderwerp === 'Week van de Mediawijsheid 2026' && r.soort !== 'Doorplaatsing' && !top.has(r.id))
         .sort((a, b) => (b.datum || '').localeCompare(a.datum || '') || b.id.localeCompare(a.id))
-        .map((r) => ({ id: r.id, datum_label: r.datum_label, kanaal: r.kanaal, bron: r.bron, titel: r.titel, url: r.url }));
+        .map((r) => ({ id: r.id, datum_label: r.datum_label, kanaal: r.kanaal, bron: r.bron, titel: r.titel, url: r.url, afbeelding: r.afbeelding || '' }));
     },
   });
 
@@ -415,10 +432,17 @@
     el.style.backgroundImage = d.status === 'ok' && typeof d.data === 'string' && d.data.startsWith('data:image/') ? `url("${d.data.trim()}")` : 'none';
   });
 
+  dash.draw('camplogo', (el) => {
+    const d = dash.data('logo_wvdm2026');
+    el.style.backgroundImage = d.status === 'ok' && typeof d.data === 'string' && d.data.startsWith('data:image/') ? `url("${d.data.trim()}")` : 'none';
+  });
+
   window.nmTile = (r, cls) => {
     const kleur = window.NM_COLORS[Math.max(0, window.NM_KANALEN.indexOf(r.kanaal))];
     const t = document.createElement('div'); t.className = cls;
-    t.style.background = `linear-gradient(135deg, ${kleur}, ${kleur}66)`;
+    const foto = window.NM_IMAGES && typeof r.afbeelding === 'string' && r.afbeelding.startsWith('https://') ? r.afbeelding.replace(/["'()\s\\]/g, encodeURIComponent) : '';
+    t.style.background = (foto ? `center / cover no-repeat url("${foto}"), ` : '') + `linear-gradient(135deg, ${kleur}, ${kleur}66)`;
+    if (foto) t.classList.add('nm-foto');
     t.textContent = String(r.bron || '?').replace(/^www\./, '').charAt(0).toUpperCase();
     return t;
   };
