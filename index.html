@@ -16,7 +16,7 @@
   @media (prefers-reduced-motion: reduce) { .dash-skeleton { animation: none; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="assets/dash-shim.js?v=2026110815"></script>
+<script src="assets/dash-shim.js?v=2026110816"></script>
 </head>
 <body>
 <div id="dash-root">
@@ -250,6 +250,26 @@
     .nm-kvs .nm-v b.nm-aantal { font-variant-numeric: tabular-nums; }
     .nm-intro .nm-line.nm-kvs + .nm-line.nm-kvs { margin-top: 0; }
   }
+  /* v17: telefoon - lichtkranten laten zien dat ze schuiven */
+  .nm-recent-wrap { position: relative; min-width: 0; }
+  .nm-pijl, .nm-voortgang { display: none; }
+  @media (max-width: 640px) {
+    .nm-recent .nm-kaart { flex-basis: 74vw; }
+    .nm-recent { -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 26px), transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 26px), transparent 100%); }
+    .nm-pijl { display: flex; align-items: center; justify-content: center; position: absolute; top: 70px; width: 14px; height: 44px; padding: 0; border: 0; background: none; color: rgba(255,255,255,.85); font: 700 22px/1 Arial, Helvetica, sans-serif; cursor: pointer; z-index: 2; }
+    .nm-pijl-l { left: -14px; }
+    .nm-pijl-r { right: -14px; }
+    .nm-pijl[hidden] { display: none; }
+    .nm-voortgang { display: block; position: relative; background: rgba(0,0,0,.55); border-radius: 999px; overflow: hidden; }
+    .nm-voortgang i { position: absolute; display: block; background: #ffffff; border-radius: 999px; }
+    .nm-voortgang-x { height: 5px; margin: 10px 0 0; }
+    .nm-voortgang-x i { top: 0; bottom: 0; left: 0; width: 20%; }
+    .nm-ticker-wrap { padding-right: 14px; }
+    .nm-voortgang-y { position: absolute; top: 12px; bottom: 0; right: 0; width: 5px; }
+    .nm-voortgang-y i { left: 0; right: 0; top: 0; height: 20%; }
+    .nm-recent, .nm-ticker { scrollbar-width: none; }
+    .nm-recent::-webkit-scrollbar, .nm-ticker::-webkit-scrollbar { display: none; }
+  }
   [data-dash-source-state=empty] { color: transparent; }
   [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
 </style>
@@ -284,9 +304,15 @@
 
     <section class="nm-feed" id="berichten-feed">
       <h2>Meest recent</h2>
-      <div class="nm-recent dash-skeleton" data-draw="recent" data-source="wvdm_recent ph1 ph2 ph3 ph4"></div>
+      <div class="nm-recent-wrap">
+        <button type="button" class="nm-pijl nm-pijl-l" aria-label="Vorige berichten" hidden>‹</button>
+        <div class="nm-recent dash-skeleton" data-draw="recent" data-source="wvdm_recent ph1 ph2 ph3 ph4"></div>
+        <button type="button" class="nm-pijl nm-pijl-r" aria-label="Volgende berichten">›</button>
+        <div class="nm-voortgang nm-voortgang-x" aria-hidden="true"><i></i></div>
+      </div>
       <div class="nm-ticker-wrap">
         <div class="nm-ticker dash-skeleton" data-draw="ticker" data-source="wvdm_overig ph1 ph2 ph3 ph4" tabindex="0" aria-label="Overige berichten, schuift automatisch. Muis erop om te stoppen."></div>
+        <div class="nm-voortgang nm-voortgang-y" aria-hidden="true"><i></i></div>
       </div>
     </section>
 
@@ -700,14 +726,14 @@
   // automatisch schuiven (x = horizontaal, y = verticaal); stopt bij muis/aanraking/focus, handmatig scrollen kan
   window.nmAuto = (el, axis, SPEED) => {
     const P = axis === 'x' ? 'scrollLeft' : 'scrollTop';
-    const st = { paused: false, userUntil: 0, last: 0, prog: false, raf: 0, loop: false, pos: 0, half: 0 };
+    const st = { paused: false, userUntil: 0, last: 0, prog: false, raf: 0, loop: false, pos: 0, half: 0, lastSet: -999 };
     st.reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    const onEnter = () => { st.paused = true; };
-    const onLeave = () => { st.paused = false; st.pos = el[P]; };
+    const onEnter = (e) => { if (e.type === 'focusin' ? !(e.target.matches && e.target.matches(':focus-visible')) : e.pointerType !== 'mouse') return; st.paused = true; };
+    const onLeave = (e) => { if (e.type !== 'focusout' && e.pointerType !== 'mouse') return; st.paused = false; st.pos = el[P]; };
     const onTouch = () => { st.paused = true; st.userUntil = performance.now() + 4000; };
     const onTouchEnd = () => { st.paused = false; st.userUntil = performance.now() + 4000; };
-    const onScroll = () => { if (st.prog) { st.prog = false; return; } st.userUntil = performance.now() + 4000; st.pos = el[P]; };
-    el.addEventListener('mouseenter', onEnter); el.addEventListener('mouseleave', onLeave);
+    const onScroll = () => { if (Math.abs(el[P] - st.lastSet) < 2) return; st.userUntil = performance.now() + 4000; st.pos = el[P]; };
+    el.addEventListener('pointerenter', onEnter); el.addEventListener('pointerleave', onLeave);
     el.addEventListener('focusin', onEnter); el.addEventListener('focusout', onLeave);
     el.addEventListener('touchstart', onTouch, { passive: true }); el.addEventListener('touchend', onTouchEnd);
     el.addEventListener('scroll', onScroll, { passive: true });
@@ -716,19 +742,52 @@
       if (!st.reduce && st.loop && st.half > 0 && !st.paused && !window.NM_PAUSED && now > st.userUntil) {
         st.pos += SPEED * dt;
         if (st.pos >= st.half) st.pos -= st.half;
-        if (Math.abs(el[P] - st.pos) >= 0.5) { st.prog = true; el[P] = st.pos; }
+        if (Math.abs(el[P] - st.pos) >= 0.5) { el[P] = st.pos; st.lastSet = el[P]; }
       }
       st.raf = requestAnimationFrame(tick);
     };
     st.raf = requestAnimationFrame(tick);
     st.cleanup = () => {
       cancelAnimationFrame(st.raf);
-      el.removeEventListener('mouseenter', onEnter); el.removeEventListener('mouseleave', onLeave);
+      el.removeEventListener('pointerenter', onEnter); el.removeEventListener('pointerleave', onLeave);
       el.removeEventListener('focusin', onEnter); el.removeEventListener('focusout', onLeave);
       el.removeEventListener('touchstart', onTouch); el.removeEventListener('touchend', onTouchEnd);
       el.removeEventListener('scroll', onScroll);
     };
     return st;
+  };
+
+  // voortgangsbalkje en pijltjes (telefoon); werkt met de dubbele lijst van de lichtkrant
+  window.nmVoortgang = (el, axis, balk, links, rechts) => {
+    const X = axis === 'x';
+    const teken = () => {
+      const totaal = X ? el.scrollWidth : el.scrollHeight;
+      const zicht = X ? el.clientWidth : el.clientHeight;
+      const pos = X ? el.scrollLeft : el.scrollTop;
+      const dubbel = !!el.querySelector('[aria-hidden="true"]');
+      const lengte = dubbel ? totaal / 2 : totaal;
+      const bereik = dubbel ? lengte : Math.max(1, totaal - zicht);
+      const deel = Math.max(0.08, Math.min(1, zicht / Math.max(1, lengte)));
+      const plek = Math.min(1, ((pos % bereik) + bereik) % bereik / bereik);
+      if (balk) {
+        const i = balk.firstElementChild;
+        if (X) { i.style.width = (deel * 100) + '%'; i.style.left = (plek * (1 - deel) * 100) + '%'; }
+        else { i.style.height = (deel * 100) + '%'; i.style.top = (plek * (1 - deel) * 100) + '%'; }
+        balk.style.visibility = totaal > zicht + 4 ? 'visible' : 'hidden';
+      }
+      if (links) links.hidden = pos < 8;
+    };
+    el.addEventListener('scroll', teken, { passive: true });
+    window.addEventListener('resize', teken);
+    const stap = (richting) => {
+      const kaart = el.querySelector('.nm-kaart, .nm-trow');
+      const breedte = kaart ? (X ? kaart.getBoundingClientRect().width + 14 : kaart.getBoundingClientRect().height) : (X ? el.clientWidth : el.clientHeight) * 0.8;
+      el.scrollBy(X ? { left: richting * breedte, behavior: 'smooth' } : { top: richting * breedte, behavior: 'smooth' });
+    };
+    if (links) links.addEventListener('click', () => stap(-1));
+    if (rechts) rechts.addEventListener('click', () => stap(1));
+    setTimeout(teken, 300);
+    return teken;
   };
 
   // slepen met de muis, zoals vegen op een telefoon; na slepen opent er geen bericht
@@ -784,7 +843,13 @@
 
   // horizontale lichtkrant met de vijftien nieuwste berichten (rustiger tempo)
   dash.draw('recent', {
-    mount: (el) => { window.nmSleep(el, 'x'); return window.nmAuto(el, 'x', 15); },
+    mount: (el) => {
+      window.nmSleep(el, 'x');
+      const w = el.parentElement;
+      const st = window.nmAuto(el, 'x', 15);
+      st.teken = window.nmVoortgang(el, 'x', w.querySelector('.nm-voortgang-x'), w.querySelector('.nm-pijl-l'), w.querySelector('.nm-pijl-r'));
+      return st;
+    },
     update: (el, st) => {
       const d = dash.data('wvdm_recent');
       el.replaceChildren();
@@ -810,7 +875,8 @@
         st.half = el.children[n].offsetLeft - el.children[0].offsetLeft;
         st.loop = st.half > 0;
       }
-      st.pos = st.half ? st.pos % st.half : 0; st.prog = true; el.scrollLeft = st.pos;
+      st.pos = st.half ? st.pos % st.half : 0; el.scrollLeft = st.pos; st.lastSet = el.scrollLeft;
+      if (st.teken) setTimeout(st.teken, 50);
     },
     unmount: (el, st) => { if (st && st.cleanup) st.cleanup(); },
   });
@@ -819,18 +885,19 @@
   dash.draw('ticker', {
     mount: (el) => {
       window.nmSleep(el, 'y');
-      const st = { paused: false, userUntil: 0, last: 0, prog: false, raf: 0, loop: false, pos: 0 };
+      const st = { paused: false, userUntil: 0, last: 0, prog: false, raf: 0, loop: false, pos: 0, lastSet: -999 };
+      st.teken = window.nmVoortgang(el, 'y', el.parentElement.querySelector('.nm-voortgang-y'));
       const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const SPEED = 18; // pixels per seconde
-      const onEnter = () => { st.paused = true; };
-      const onLeave = () => { st.paused = false; st.pos = el.scrollTop; };
+      const onEnter = (e) => { if (e.type === 'focusin' ? !(e.target.matches && e.target.matches(':focus-visible')) : e.pointerType !== 'mouse') return; st.paused = true; };
+      const onLeave = (e) => { if (e.type !== 'focusout' && e.pointerType !== 'mouse') return; st.paused = false; st.pos = el.scrollTop; };
       const onTouch = () => { st.paused = true; st.userUntil = performance.now() + 4000; };
       const onTouchEnd = () => { st.paused = false; st.userUntil = performance.now() + 4000; };
       const onScroll = () => {
-        if (st.prog) { st.prog = false; return; }
+        if (Math.abs(el.scrollTop - st.lastSet) < 2) return;
         st.userUntil = performance.now() + 4000; st.pos = el.scrollTop;
       };
-      el.addEventListener('mouseenter', onEnter); el.addEventListener('mouseleave', onLeave);
+      el.addEventListener('pointerenter', onEnter); el.addEventListener('pointerleave', onLeave);
       el.addEventListener('focusin', onEnter); el.addEventListener('focusout', onLeave);
       el.addEventListener('touchstart', onTouch, { passive: true }); el.addEventListener('touchend', onTouchEnd);
       el.addEventListener('scroll', onScroll, { passive: true });
@@ -840,14 +907,14 @@
           const half = el.scrollHeight / 2;
           st.pos += SPEED * dt;
           if (st.pos >= half) st.pos -= half;
-          if (Math.abs(el.scrollTop - st.pos) >= 0.5) { st.prog = true; el.scrollTop = st.pos; }
+          if (Math.abs(el.scrollTop - st.pos) >= 0.5) { el.scrollTop = st.pos; st.lastSet = el.scrollTop; }
         }
         st.raf = requestAnimationFrame(tick);
       };
       st.raf = requestAnimationFrame(tick);
       st.cleanup = () => {
         cancelAnimationFrame(st.raf);
-        el.removeEventListener('mouseenter', onEnter); el.removeEventListener('mouseleave', onLeave);
+        el.removeEventListener('pointerenter', onEnter); el.removeEventListener('pointerleave', onLeave);
         el.removeEventListener('focusin', onEnter); el.removeEventListener('focusout', onLeave);
         el.removeEventListener('touchstart', onTouch); el.removeEventListener('touchend', onTouchEnd);
         el.removeEventListener('scroll', onScroll);
@@ -895,7 +962,8 @@
       };
       el.append(lijst(false));
       if (!st.reduce && el.scrollHeight > el.clientHeight + 20) { el.append(lijst(true)); st.loop = true; }
-      st.pos = Math.min(st.pos, el.scrollHeight / 2); st.prog = true; el.scrollTop = st.pos;
+      st.pos = Math.min(st.pos, el.scrollHeight / 2); el.scrollTop = st.pos; st.lastSet = el.scrollTop;
+      if (st.teken) setTimeout(st.teken, 50);
     },
     unmount: (el, st) => { if (st && st.cleanup) st.cleanup(); },
   });
