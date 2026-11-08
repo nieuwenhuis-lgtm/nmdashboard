@@ -115,6 +115,17 @@
   .nm-trow a, .nm-trow .nm-ttitel { color: #ffffff; font-size: 17px; font-weight: 700; line-height: 1.3; text-decoration: none; display: block; }
   .nm-trow a:hover { text-decoration: underline; text-underline-offset: 3px; }
   .nm-trow .nm-tdatum { font-size: 14px; color: var(--nm-muted); margin-top: 2px; }
+  /* v5: compacte intro, lichtere panelen, horizontale lichtkrant */
+  .nm-page { --nm-panel: rgba(24,28,35,.67); --nm-panel2: rgba(36,41,51,.6); }
+  .nm-intro { padding: 12px 18px; }
+  .nm-intro .nm-line { font-size: 17px; font-weight: 400; line-height: 1.6; color: var(--nm-fg); margin: 0; }
+  .nm-intro .nm-line b { font-weight: 700; color: #ffffff; font-variant-numeric: tabular-nums; }
+  .nm-intro .nm-line .nm-fine { font-size: 15px; color: var(--nm-muted); }
+  .nm-recent { display: flex; gap: 14px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; scrollbar-color: #4a5361 transparent; min-height: 290px; padding-bottom: 6px; }
+  .nm-recent .nm-kaart { flex: 0 0 300px; }
+  @media (max-width: 520px) { .nm-recent .nm-kaart { flex-basis: 260px; } }
+  .nm-ticker-wrap::before { background: linear-gradient(180deg, rgba(24,28,35,.7), rgba(24,28,35,0)); }
+  .nm-ticker-wrap::after { background: linear-gradient(0deg, rgba(24,28,35,.7), rgba(24,28,35,0)); }
   [data-dash-source-state=empty] { color: transparent; }
   [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
 </style>
@@ -136,10 +147,7 @@
 
   <div class="nm-topic" data-onderwerp="wvdm2026">
     <section class="nm-intro" id="samenvatting">
-      <p class="nm-big">Vermeldingen tot <span class="dash-skeleton" data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="stand_label">—</span>: <span class="nm-v dash-skeleton" data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="totaal">—</span></p>
-      <p class="nm-small">Week van de Mediawijsheid: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="wvdm_aantal">—</b><span class="nm-dot">·</span>#wvdm: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="hashtag_totaal">—</b><span class="nm-dot">·</span>MediaMasters: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="mm_totaal">—</b></p>
-      <p class="nm-small">Drukste dag: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_datum_label">—</b>, <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_aantal">—</b> vermeldingen<span class="nm-dot">·</span>Drukste dag #wvdm: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="hashtag_piek_datum_label">—</b>, <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="hashtag_piek_aantal">—</b> vermeldingen</p>
-      <p class="nm-fine">Deze vermeldingen kunnen foutmarges bevatten.</p>
+      <p class="nm-line">Vermeldingen tot <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="stand_label">—</b>: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="totaal">—</b><span class="nm-dot">·</span>Week van de Mediawijsheid: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="wvdm_aantal">—</b><span class="nm-dot">·</span>#wvdm: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="hashtag_totaal">—</b><span class="nm-dot">·</span>MediaMasters: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="mm_totaal">—</b><span class="nm-dot">·</span>Drukste dag: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_datum_label">—</b>, <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_aantal">—</b> vermeldingen<span class="nm-dot">·</span>Drukste dag #wvdm: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="hashtag_piek_datum_label">—</b>, <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="hashtag_piek_aantal">—</b> vermeldingen<span class="nm-dot">·</span><span class="nm-fine">Deze vermeldingen kunnen foutmarges bevatten.</span></p>
     </section>
 
     <section class="nm-feed" id="berichten-feed">
@@ -250,7 +258,7 @@
         <dt>Datum</dt>
         <dd>De publicatiedatum van de pagina of post. Agenda- en informatiepagina's hebben vaak geen datum: die tellen mee in de totalen, maar niet in de grafiek per dag; in de lichtkrant staan ze achteraan.</dd>
         <dt>Meest recent en lichtkrant</dt>
-        <dd>Bovenaan de drie nieuwste vermeldingen met datum, met een korte eigen samenvatting (geen citaat uit het bericht). Daaronder schuiven alle overige vermeldingen voorbij; doorplaatsingen van hetzelfde bericht staan alleen in de volledige lijst.</dd>
+        <dd>Bovenaan schuiven de vijftien nieuwste vermeldingen met datum horizontaal voorbij, met een korte eigen samenvatting (geen citaat uit het bericht). Daaronder schuiven alle overige vermeldingen verticaal voorbij; doorplaatsingen van hetzelfde bericht staan alleen in de volledige lijst.</dd>
         <dt>Wat ontbreekt</dt>
         <dd>De eigen campagnepagina's op netwerkmediawijsheid.nl, mediawijsheid.nl en weekvandemediawijsheid.nl, en X, TikTok en YouTube.</dd>
       </dl>
@@ -345,11 +353,11 @@
   dash.calc('wvdm_recent', {
     inputs: ['vermeldingen'],
     title: 'WvdM 2026: meest recent',
-    description: 'De drie nieuwste vermeldingen met datum, zonder doorplaatsingen.',
+    description: 'De vijftien nieuwste vermeldingen met datum, zonder doorplaatsingen.',
     fn: (vermeldingen) => vermeldingen
       .filter((r) => r.onderwerp === 'Week van de Mediawijsheid 2026' && r.datum && r.soort !== 'Doorplaatsing')
       .sort((a, b) => b.datum.localeCompare(a.datum) || b.id.localeCompare(a.id))
-      .slice(0, 3)
+      .slice(0, 15)
       .map((r) => ({ id: r.id, datum_label: r.datum_label, kanaal: r.kanaal, bron: r.bron, titel: r.titel, samenvatting: r.samenvatting, url: r.url })),
   });
 
@@ -422,6 +430,91 @@
     return a;
   };
 
+  // automatisch schuiven (x = horizontaal, y = verticaal); stopt bij muis/aanraking/focus, handmatig scrollen kan
+  window.nmAuto = (el, axis, SPEED) => {
+    const P = axis === 'x' ? 'scrollLeft' : 'scrollTop';
+    const st = { paused: false, userUntil: 0, last: 0, prog: false, raf: 0, loop: false, pos: 0, half: 0 };
+    st.reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    const onEnter = () => { st.paused = true; };
+    const onLeave = () => { st.paused = false; st.pos = el[P]; };
+    const onTouch = () => { st.paused = true; st.userUntil = performance.now() + 4000; };
+    const onTouchEnd = () => { st.paused = false; st.userUntil = performance.now() + 4000; };
+    const onScroll = () => { if (st.prog) { st.prog = false; return; } st.userUntil = performance.now() + 4000; st.pos = el[P]; };
+    el.addEventListener('mouseenter', onEnter); el.addEventListener('mouseleave', onLeave);
+    el.addEventListener('focusin', onEnter); el.addEventListener('focusout', onLeave);
+    el.addEventListener('touchstart', onTouch, { passive: true }); el.addEventListener('touchend', onTouchEnd);
+    el.addEventListener('scroll', onScroll, { passive: true });
+    const tick = (now) => {
+      const dt = st.last ? Math.min(0.1, (now - st.last) / 1000) : 0; st.last = now;
+      if (!st.reduce && st.loop && st.half > 0 && !st.paused && now > st.userUntil) {
+        st.pos += SPEED * dt;
+        if (st.pos >= st.half) st.pos -= st.half;
+        if (Math.abs(el[P] - st.pos) >= 0.5) { st.prog = true; el[P] = st.pos; }
+      } else if (st.loop && st.half > 0 && el[P] >= st.half) {
+        st.pos = el[P] - st.half; st.prog = true; el[P] = st.pos;
+      }
+      st.raf = requestAnimationFrame(tick);
+    };
+    st.raf = requestAnimationFrame(tick);
+    st.cleanup = () => {
+      cancelAnimationFrame(st.raf);
+      el.removeEventListener('mouseenter', onEnter); el.removeEventListener('mouseleave', onLeave);
+      el.removeEventListener('focusin', onEnter); el.removeEventListener('focusout', onLeave);
+      el.removeEventListener('touchstart', onTouch); el.removeEventListener('touchend', onTouchEnd);
+      el.removeEventListener('scroll', onScroll);
+    };
+    return st;
+  };
+
+  window.nmKaart = (r) => {
+    const kaart = document.createElement('article'); kaart.className = 'nm-kaart';
+    const beeld = window.nmTile(r, 'nm-kaart-beeld');
+    beeld.textContent = '';
+    const letter = document.createElement('span'); letter.className = 'nm-letter';
+    letter.textContent = String(r.bron || '?').replace(/^www\./, '').charAt(0).toUpperCase();
+    const badge = document.createElement('span'); badge.className = 'nm-badge'; badge.textContent = r.kanaal;
+    beeld.append(letter, badge);
+    const body = document.createElement('div'); body.className = 'nm-kaart-body';
+    const meta = document.createElement('div'); meta.className = 'nm-kaart-meta'; meta.textContent = r.bron + ' · ' + r.datum_label;
+    const tekst = document.createElement('p'); tekst.className = 'nm-kaart-tekst'; tekst.textContent = r.samenvatting || '';
+    body.append(meta, window.nmLink(r, 'nm-kaart-titel'), tekst);
+    kaart.append(beeld, body);
+    return kaart;
+  };
+
+  // horizontale lichtkrant met de vijftien nieuwste berichten (rustiger tempo)
+  dash.draw('recent', {
+    mount: (el) => window.nmAuto(el, 'x', 15),
+    update: (el, st) => {
+      const d = dash.data('wvdm_recent');
+      el.replaceChildren();
+      st.loop = false; st.half = 0;
+      if (d.status === 'loading') { el.classList.add('dash-skeleton'); return; }
+      el.classList.remove('dash-skeleton');
+      if (d.status !== 'ok') {
+        if (d.status === 'error') {
+          const f = document.createElement('div'); f.className = 'nm-fail';
+          f.append(document.createElement('i'), 'Failed to load');
+          el.append(f);
+        } else { el.textContent = '—'; }
+        return;
+      }
+      d.data.forEach((r) => el.append(window.nmKaart(r)));
+      const n = d.data.length;
+      if (!st.reduce && n > 0 && el.scrollWidth > el.clientWidth + 20) {
+        d.data.forEach((r) => {
+          const k = window.nmKaart(r); k.setAttribute('aria-hidden', 'true');
+          k.querySelectorAll('a').forEach((a) => { a.tabIndex = -1; });
+          el.append(k);
+        });
+        st.half = el.children[n].offsetLeft - el.children[0].offsetLeft;
+        st.loop = st.half > 0;
+      }
+      st.pos = st.half ? st.pos % st.half : 0; st.prog = true; el.scrollLeft = st.pos;
+    },
+    unmount: (el, st) => { if (st && st.cleanup) st.cleanup(); },
+  });
+
   // lichtkrant: schuift automatisch, stopt bij muis/aanraking, handmatig scrollen kan
   dash.draw('ticker', {
     mount: (el) => {
@@ -485,7 +578,7 @@
           const body = document.createElement('div');
           const a = window.nmLink(r, 'nm-ttitel');
           if (copy && a.tagName === 'A') a.tabIndex = -1;
-          const dt = document.createElement('div'); dt.className = 'nm-tdatum'; dt.textContent = r.datum_label;
+          const dt = document.createElement('div'); dt.className = 'nm-tdatum'; dt.textContent = (r.bron ? r.bron + ' · ' : '') + r.datum_label;
           body.append(a, dt);
           row.append(window.nmTile(r, 'nm-ttile'), body);
           box.append(row);
@@ -499,7 +592,8 @@
     unmount: (el, st) => { if (st && st.cleanup) st.cleanup(); },
   });
 
-  dash.draw('recent', (el) => {
+  // oude vaste kaartweergave, niet meer in gebruik
+  false && dash.draw('recent_oud', (el) => {
     const d = dash.data('wvdm_recent');
     el.replaceChildren();
     if (d.status === 'loading') { el.classList.add('dash-skeleton'); return; }
