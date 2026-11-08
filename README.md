@@ -15,7 +15,7 @@ Openbaar dashboard dat laat zien hoe campagnes en onderwerpen online leven. Eers
 ## Online zetten (eenmalig)
 
 Settings → Pages → Source: *Deploy from a branch* → branch `main`, map `/ (root)` → Save.
-Na een paar minuten staat het dashboard op `https://nieuwenhuis-lgtm.github.io/nmdashboard/`.
+Het dashboard staat op `https://nmdashboard.oirik.com/` (eigen domein, ingesteld via het bestand `CNAME` en een CNAME-record bij TransIP).
 
 ## Een rubriek toevoegen
 
