@@ -16,7 +16,7 @@
   @media (prefers-reduced-motion: reduce) { .dash-skeleton { animation: none; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="assets/dash-shim.js?v=2026110814"></script>
+<script src="assets/dash-shim.js?v=2026110815"></script>
 </head>
 <body>
 <div id="dash-root">
@@ -234,6 +234,22 @@
   .nm-recent, .nm-ticker { cursor: grab; }
   .nm-sleept, .nm-sleept * { cursor: grabbing !important; user-select: none; -webkit-user-select: none; }
   .nm-recent img, .nm-ticker img { -webkit-user-drag: none; }
+  /* v16: telefoon - keuzelijst bovenaan, titel onder het logo, aantallen als lijstje */
+  .nm-kv { display: inline; }
+  @media (max-width: 640px) {
+    .nm-top { display: flex; flex-direction: column; align-items: stretch; gap: 14px; }
+    .nm-top .nm-pick { order: -1; }
+    .nm-brand { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .nm-brand .nm-divider { display: none; }
+    .nm-brand h1 { width: 100%; }
+    .nm-kvs .nm-dot, .nm-kvs .nm-komma { display: none; }
+    .nm-kvs { display: block; }
+    .nm-kvs .nm-kv { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.14); }
+    .nm-kvs .nm-k { min-width: 0; }
+    .nm-kvs .nm-v { flex: none; text-align: right; white-space: nowrap; }
+    .nm-kvs .nm-v b.nm-aantal { font-variant-numeric: tabular-nums; }
+    .nm-intro .nm-line.nm-kvs + .nm-line.nm-kvs { margin-top: 0; }
+  }
   [data-dash-source-state=empty] { color: transparent; }
   [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
 </style>
@@ -256,8 +272,8 @@
   <div class="nm-topic" data-onderwerp="wvdm2026">
     <div class="nm-introrow">
     <section class="nm-intro" id="samenvatting">
-      <p class="nm-line">Vermeldingen tot <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="stand_label">—</b>: <b class="nm-aantal" data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="totaal">—</b><span class="nm-dot">·</span>Week van de Mediawijsheid: <b class="nm-aantal" data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="wvdm_aantal">—</b><span class="nm-dot">·</span>MediaMasters: <b class="nm-aantal" data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="mm_totaal">—</b></p>
-      <p class="nm-line">Drukste dag: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_datum_label">—</b>, <b class="nm-aantal" data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_aantal">—</b> vermeldingen</p>
+      <p class="nm-line nm-kvs"><span class="nm-kv"><span class="nm-k">Vermeldingen tot <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="stand_label">—</b>:</span> <span class="nm-v"><b class="nm-aantal" data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="totaal">—</b></span></span><span class="nm-dot">·</span><span class="nm-kv"><span class="nm-k">Week van de Mediawijsheid:</span> <span class="nm-v"><b class="nm-aantal" data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="wvdm_aantal">—</b></span></span><span class="nm-dot">·</span><span class="nm-kv"><span class="nm-k">MediaMasters:</span> <span class="nm-v"><b class="nm-aantal" data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="mm_totaal">—</b></span></span></p>
+      <p class="nm-line nm-kvs"><span class="nm-kv"><span class="nm-k">Drukste dag: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_datum_label">—</b><span class="nm-komma">,</span></span> <span class="nm-v"><b class="nm-aantal" data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_aantal">—</b> vermeldingen</span></span></p>
       <p class="nm-line"><span class="nm-fine">Deze vermeldingen kunnen foutmarges bevatten.<span class="nm-dot">·</span>Laatst bijgewerkt: <span data-draw="bijgewerkt" data-source="vermeldingen">—</span></span></p>
     </section>
       <div class="nm-logos">
