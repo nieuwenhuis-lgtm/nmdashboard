@@ -16,7 +16,7 @@
   @media (prefers-reduced-motion: reduce) { .dash-skeleton { animation: none; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="assets/dash-shim.js?v=2026110808"></script>
+<script src="assets/dash-shim.js?v=2026110809"></script>
 </head>
 <body>
 <div id="dash-root">
@@ -158,6 +158,41 @@
   .nm-pop-box { background: #ffffff; border-radius: 12px; width: min(100%, 480px); max-height: 90vh; overflow: auto; position: relative; padding: 12px; font-family: Arial, Helvetica, sans-serif; }
   .nm-pop-x { position: absolute; top: 6px; right: 8px; border: 0; background: #0e1116; color: #ffffff; width: 34px; height: 34px; border-radius: 50%; font-size: 20px; line-height: 1; cursor: pointer; z-index: 2; }
   .nm-pop-link { display: block; text-align: center; margin: 8px 0 2px; color: #145ecc; font-size: 15px; }
+  /* v9: past op de telefoon, duidelijke schuifbalken, kaderkopjes gelijk, lichter lichtkrantkader, kanaalpictogrammen */
+  .nm-page { grid-template-columns: minmax(0, 1fr); }
+  .nm-topic { grid-template-columns: minmax(0, 1fr); }
+  .nm-top, .nm-topic, .nm-feed, .nm-compact, .nm-introrow, .nm-intro, .nm-pick, .nm-card, .nm-ticker-wrap { min-width: 0; max-width: 100%; }
+  .nm-onderwerp { min-width: 0; max-width: 100%; }
+  .nm-feed { background: rgba(24,28,35,.62); }
+  .nm-ticker-wrap::before { background: linear-gradient(180deg, rgba(24,28,35,.62), rgba(24,28,35,0)); }
+  .nm-ticker-wrap::after { background: linear-gradient(0deg, rgba(24,28,35,.62), rgba(24,28,35,0)); }
+  .nm-feed h2, .nm-card h2, .nm-lijst > summary, .nm-details > summary { color: #ffffff; font-size: 26px; font-weight: 700; line-height: 1.25; margin: 0 0 6px; }
+  .nm-feed h2 { margin: 0; }
+  .nm-recent, .nm-ticker, .nm-tablebox { scrollbar-width: auto; scrollbar-color: #5B6270 rgba(213,217,224,.55); }
+  .nm-recent::-webkit-scrollbar, .nm-ticker::-webkit-scrollbar, .nm-tablebox::-webkit-scrollbar { width: 12px; height: 12px; }
+  .nm-recent::-webkit-scrollbar-track, .nm-ticker::-webkit-scrollbar-track, .nm-tablebox::-webkit-scrollbar-track { background: rgba(213,217,224,.55); border-radius: 999px; }
+  .nm-recent::-webkit-scrollbar-thumb, .nm-ticker::-webkit-scrollbar-thumb, .nm-tablebox::-webkit-scrollbar-thumb { background: #5B6270; border-radius: 999px; border: 2px solid rgba(213,217,224,.55); background-clip: padding-box; }
+  .nm-recent::-webkit-scrollbar-thumb:hover, .nm-ticker::-webkit-scrollbar-thumb:hover, .nm-tablebox::-webkit-scrollbar-thumb:hover { background-color: #474d59; }
+  .nm-recent { padding-bottom: 10px; }
+  .nm-ticker-wrap::before, .nm-ticker-wrap::after { right: 16px; }
+  .nm-trow { padding-left: 6px; }
+  .nm-trow .nm-ttile { position: relative; }
+  .nm-tkanaal { position: absolute; left: -5px; bottom: -5px; width: 20px; height: 20px; border-radius: 5px; background: no-repeat center / 130% 130%; font-size: 0; text-shadow: none; box-shadow: 0 0 0 2px rgba(24,28,35,.85); pointer-events: none; }
+  @media (max-width: 640px) {
+    .nm-page { font-size: 16px; padding-left: 12px; padding-right: 12px; }
+    .nm-top { flex-direction: column; align-items: stretch; gap: 12px; }
+    .nm-pick { flex-wrap: wrap; gap: 6px; }
+    .nm-onderwerp { width: 100%; }
+    .nm-introrow .nm-intro { width: 100%; box-sizing: border-box; }
+    .nm-camplogo { width: 120px; height: 85px; }
+    .nm-feed, .nm-card { padding: 14px; }
+    .nm-feed h2, .nm-card h2, .nm-lijst > summary, .nm-details > summary { font-size: 22px; }
+    .nm-recent .nm-kaart { flex-basis: 80vw; }
+    .nm-kaart-titel { font-size: 17px; overflow-wrap: anywhere; }
+    .nm-trow a, .nm-trow .nm-ttitel { font-size: 16px; overflow-wrap: anywhere; }
+    .nm-tagrow { grid-template-columns: minmax(0, 7.5rem) 1fr 2.2rem; font-size: 15px; }
+    .nm-intro .nm-line { overflow-wrap: anywhere; }
+  }
   [data-dash-source-state=empty] { color: transparent; }
   [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
 </style>
@@ -305,6 +340,7 @@
 
 <script>
   window.NM_KANALEN = ['Website', 'Instagram', 'Facebook', 'LinkedIn'];
+  window.NM_ICONS = {"Instagram": "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 50 50%22 fill=%22%23fff%22%3E%3Cpath d=%22M35.5,16.21c-2.78,2.13-5.92-1.05-3.73-3.79,2.76-2.01,5.76,1.05,3.73,3.79Z%22/%3E%3Cpath d=%22M23.6,38.91c-6.3,0-11.42-5.12-11.42-11.42s5.12-11.42,11.42-11.42,11.42,5.12,11.42,11.42-5.12,11.42-11.42,11.42ZM23.6,20.07c-4.09,0-7.42,3.33-7.42,7.42s3.33,7.42,7.42,7.42,7.42-3.33,7.42-7.42-3.33-7.42-7.42-7.42Z%22/%3E%3C/svg%3E", "Facebook": "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 50 50%22 fill=%22%23fff%22%3E%3Cpath d=%22M31.1,15.63h-2.88s-1.22.05-1.22,1.46v2.8h4.09l-.33,4.75h-3.76v13.33h-5.57v-13.36h-2.82v-4.7h2.82v-3.62s-.26-1.88,1.53-3.55c0,0,1.13-1.34,3.41-1.37,0,0,.63-.02.66-.02h4.07s0,4.28,0,4.28Z%22/%3E%3C/svg%3E", "Website": "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 50 50%22 fill=%22%23fff%22%3E%3Cpath d=%22M24.85,9.86c-8.16,0-14.8,6.64-14.8,14.8s6.64,14.8,14.8,14.8,14.8-6.64,14.8-14.8-6.64-14.8-14.8-14.8ZM36.55,23.16h-4.45c-.16-3.62-.91-6.77-2.06-9.1,3.49,1.72,6.01,5.1,6.51,9.1ZM13.15,26.16h4.45c.16,3.62.91,6.77,2.06,9.1-3.49-1.72-6.01-5.1-6.51-9.1ZM17.6,23.16h-4.45c.5-4,3.02-7.38,6.51-9.1-1.15,2.33-1.9,5.48-2.06,9.1ZM25.02,36.45c-.06,0-.12,0-.17,0s-.11,0-.17,0c-1.61-.26-3.77-4.16-4.08-10.29h8.5c-.31,6.13-2.47,10.03-4.08,10.29ZM20.6,23.16c.31-6.12,2.47-10.03,4.08-10.29.06-.01.12-.01.17-.01s.11,0,.17.01c1.61.26,3.77,4.17,4.08,10.29h-8.5ZM30.04,35.26c1.15-2.33,1.9-5.48,2.06-9.1h4.45c-.5,4-3.02,7.38-6.51,9.1Z%22/%3E%3C/svg%3E", "LinkedIn": "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 50 50%22 fill=%22%23fff%22%3E%3Cpath d=%22M18.94,35.01h-4.64v-13.96h4.64v13.96ZM16.63,19.14h-.04c-1.55,0-2.56-1.07-2.56-2.41s1.04-2.41,2.63-2.41,2.56,1.04,2.59,2.41c0,1.34-1.01,2.41-2.62,2.41ZM35.68,35.01h-4.64v-7.47c0-1.87-.68-3.15-2.35-3.15-1.29,0-2.05.86-2.38,1.69-.13.3-.16.72-.16,1.13v7.8h-4.64s.06-12.65,0-13.96h4.64v1.98c.61-.95,1.71-2.31,4.18-2.31,3.06,0,5.35,2,5.35,6.29v8ZM26.15,23.07v-.04s-.02.03-.03.04h.03Z%22/%3E%3C/svg%3E"};
   window.NM_COLORS = ['#ec1162', '#f97316', '#145ecc', '#00a4ff', '#c084fc']; // Website, Instagram, Facebook, LinkedIn, MediaMasters
   window.NM_TAGS = ['#wvdm', '#wvdm2026', '#weekvandemediawijsheid', '#gezondmetjescherm', '#mediamasters', '#mediamastersnl', '#iedereenmediawijs', '@iedereenmediawijs', '@mediamastersnl', '#mediawijsheid', '#schermtijd'];
 
@@ -666,7 +702,15 @@
           if (copy && a.tagName === 'A') a.tabIndex = -1;
           const dt = document.createElement('div'); dt.className = 'nm-tdatum'; dt.textContent = (r.bron ? r.bron + ' · ' : '') + r.datum_label;
           body.append(a, dt);
-          row.append(window.nmTile(r, 'nm-ttile'), body);
+          const tegel = window.nmTile(r, 'nm-ttile');
+          const ki = Math.max(0, window.NM_KANALEN.indexOf(r.kanaal));
+          const mk = document.createElement('span'); mk.className = 'nm-tkanaal';
+          mk.style.backgroundColor = window.NM_COLORS[ki];
+          const ico = (window.NM_ICONS || {})[r.kanaal] || (window.NM_ICONS || {}).Website;
+          if (ico) mk.style.backgroundImage = `url("${ico}")`;
+          mk.title = r.kanaal || ''; mk.setAttribute('aria-label', r.kanaal || '');
+          tegel.append(mk);
+          row.append(tegel, body);
           box.append(row);
         });
         return box;
