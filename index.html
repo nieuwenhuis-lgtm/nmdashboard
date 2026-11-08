@@ -16,7 +16,7 @@
   @media (prefers-reduced-motion: reduce) { .dash-skeleton { animation: none; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="assets/dash-shim.js?v=2026110807"></script>
+<script src="assets/dash-shim.js?v=2026110808"></script>
 </head>
 <body>
 <div id="dash-root">
@@ -295,7 +295,7 @@
         <dt>Datum</dt>
         <dd>De publicatiedatum van de pagina of post. Agenda- en informatiepagina's hebben vaak geen datum: die tellen mee in de totalen, maar niet in de grafiek per dag; in de lichtkrant staan ze achteraan.</dd>
         <dt>Meest recent en lichtkrant</dt>
-        <dd>Bovenaan schuiven de vijftien nieuwste vermeldingen met datum horizontaal voorbij, met een korte eigen samenvatting (geen citaat uit het bericht). Daaronder schuiven alle overige vermeldingen verticaal voorbij; doorplaatsingen van hetzelfde bericht staan alleen in de volledige lijst.</dd>
+        <dd>Bovenaan schuiven de dertig nieuwste vermeldingen met datum horizontaal voorbij, met een korte eigen samenvatting (geen citaat uit het bericht). Daaronder schuiven alle vermeldingen verticaal voorbij, ook de dertig nieuwste; doorplaatsingen van hetzelfde bericht staan alleen in de volledige lijst.</dd>
         <dt>Wat ontbreekt</dt>
         <dd>De eigen campagnepagina's op netwerkmediawijsheid.nl, mediawijsheid.nl en weekvandemediawijsheid.nl, en X, TikTok en YouTube.</dd>
       </dl>
@@ -390,22 +390,22 @@
   dash.calc('wvdm_recent', {
     inputs: ['vermeldingen'],
     title: 'WvdM 2026: meest recent',
-    description: 'De vijftien nieuwste vermeldingen met datum, zonder doorplaatsingen.',
+    description: 'De dertig nieuwste vermeldingen met datum, zonder doorplaatsingen.',
     fn: (vermeldingen) => vermeldingen
       .filter((r) => r.onderwerp === 'Week van de Mediawijsheid 2026' && r.datum && r.soort !== 'Doorplaatsing')
       .sort((a, b) => b.datum.localeCompare(a.datum) || b.id.localeCompare(a.id))
-      .slice(0, 15)
+      .slice(0, 30)
       .map((r) => ({ id: r.id, datum_label: r.datum_label, kanaal: r.kanaal, bron: r.bron, titel: r.titel, samenvatting: r.samenvatting, url: r.url, afbeelding: r.afbeelding || '' })),
   });
 
   dash.calc('wvdm_overig', {
     inputs: ['wvdm_recent', 'vermeldingen'],
     title: 'WvdM 2026: overige berichten',
-    description: 'Alle overige vermeldingen voor de lichtkrant: nieuwste eerst, zonder datum achteraan, zonder doorplaatsingen.',
+    description: 'Alle vermeldingen voor de totaal-lichtkrant: nieuwste eerst, zonder datum achteraan, zonder doorplaatsingen.',
     fn: (wvdm_recent, vermeldingen) => {
       const top = new Set(wvdm_recent.map((r) => r.id));
       return vermeldingen
-        .filter((r) => r.onderwerp === 'Week van de Mediawijsheid 2026' && r.soort !== 'Doorplaatsing' && !top.has(r.id))
+        .filter((r) => r.onderwerp === 'Week van de Mediawijsheid 2026' && r.soort !== 'Doorplaatsing')
         .sort((a, b) => (b.datum || '').localeCompare(a.datum || '') || b.id.localeCompare(a.id))
         .map((r) => ({ id: r.id, datum_label: r.datum_label, kanaal: r.kanaal, bron: r.bron, titel: r.titel, url: r.url, afbeelding: r.afbeelding || '' }));
     },
