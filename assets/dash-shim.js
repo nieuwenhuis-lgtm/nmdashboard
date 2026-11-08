@@ -3,7 +3,7 @@
 (function () {
   const SOURCES = {
     vermeldingen: { url: 'data/vermeldingen.json', type: 'json' },
-    bg_wvdm2026: { url: 'assets/bg-wvdm2026.jpg?v=2', type: 'dataurl' },
+    bg_wvdm2026: { url: 'assets/bg-wvdm2026.jpg?v=3', type: 'dataurl' },
     logo: { url: 'assets/logo.svg', type: 'dataurl' },
     logo_wvdm2026: { url: 'assets/logo-wvdm2026.svg', type: 'dataurl' },
     logo_mediamasters: { url: 'assets/logo-mediamasters.png', type: 'dataurl' },
@@ -26,12 +26,13 @@
     if (!s) { store[id] = { status: 'missing', data: [] }; return; }
     if (!store[id]) store[id] = { status: 'loading', data: [] };
     const url = s.type === 'json' ? s.url + '?t=' + Date.now() : s.url;
+    let bijgewerkt = '';
     fetch(url, { cache: s.type === 'json' ? 'no-store' : 'default' })
-      .then((r) => { if (!r.ok) throw new Error(r.status + ' ' + r.statusText); return s.type === 'json' ? r.json() : r.blob(); })
+      .then((r) => { if (!r.ok) throw new Error(r.status + ' ' + r.statusText); bijgewerkt = r.headers.get('Last-Modified') || ''; return s.type === 'json' ? r.json() : r.blob(); })
       .then((d) => s.type === 'dataurl'
         ? new Promise((res) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(d); })
         : d)
-      .then((d) => { store[id] = { status: 'ok', data: d }; redraw(); })
+      .then((d) => { store[id] = { status: 'ok', data: d, bijgewerkt }; redraw(); })
       .catch((e) => { if (!force) { store[id] = { status: 'error', data: [], message: String(e) }; redraw(); } });
   }
 

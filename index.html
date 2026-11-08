@@ -16,7 +16,7 @@
   @media (prefers-reduced-motion: reduce) { .dash-skeleton { animation: none; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="assets/dash-shim.js?v=2026110811"></script>
+<script src="assets/dash-shim.js?v=2026110812"></script>
 </head>
 <body>
 <div id="dash-root">
@@ -222,6 +222,14 @@
   @supports (-moz-appearance: none) { .nm-recent, .nm-ticker, .nm-tablebox { scrollbar-color: #5B6270 rgba(213,217,224,.55); } }
   .nm-ticker::-webkit-scrollbar-thumb, .nm-tablebox::-webkit-scrollbar-thumb { min-height: 90px; }
   .nm-recent::-webkit-scrollbar-thumb { min-width: 90px; }
+  /* v13: rode aantallen, laatst bijgewerkt, downloadknop */
+  .nm-intro .nm-line b.nm-aantal { color: #ec1162; font-size: 18px; font-weight: 700; }
+  .nm-csv { font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 700; min-height: 44px; padding: 8px 16px; border-radius: 8px; border: 1px solid #ec1162; background: #ec1162; color: #ffffff; cursor: pointer; }
+  .nm-csv:hover { background: #c90d52; border-color: #c90d52; }
+  .nm-csv:focus-visible { outline: 2px solid #ffffff; outline-offset: 2px; }
+  .nm-csv-melding { font-size: 14px; color: var(--nm-muted); align-self: center; }
+  @media (min-width: 761px) { .nm-bg { background-size: max(112vw, 199vh) auto; background-position: right 35%; } }
+  @media (max-width: 760px) { .nm-bg { background-position: 74% top; } }
   [data-dash-source-state=empty] { color: transparent; }
   [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
 </style>
@@ -244,9 +252,9 @@
   <div class="nm-topic" data-onderwerp="wvdm2026">
     <div class="nm-introrow">
     <section class="nm-intro" id="samenvatting">
-      <p class="nm-line">Vermeldingen tot <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="stand_label">—</b>: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="totaal">—</b><span class="nm-dot">·</span>Week van de Mediawijsheid: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="wvdm_aantal">—</b><span class="nm-dot">·</span>#wvdm: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="hashtag_totaal">—</b><span class="nm-dot">·</span>MediaMasters: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="mm_totaal">—</b></p>
-      <p class="nm-line">Drukste dag: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_datum_label">—</b>, <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_aantal">—</b> vermeldingen</p>
-      <p class="nm-line"><span class="nm-fine">Deze vermeldingen kunnen foutmarges bevatten.</span></p>
+      <p class="nm-line">Vermeldingen tot <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="stand_label">—</b>: <b class="nm-aantal" data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="totaal">—</b><span class="nm-dot">·</span>Week van de Mediawijsheid: <b class="nm-aantal" data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="wvdm_aantal">—</b><span class="nm-dot">·</span>MediaMasters: <b class="nm-aantal" data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="mm_totaal">—</b></p>
+      <p class="nm-line">Drukste dag: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_datum_label">—</b>, <b class="nm-aantal" data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_aantal">—</b> vermeldingen</p>
+      <p class="nm-line"><span class="nm-fine">Deze vermeldingen kunnen foutmarges bevatten.<span class="nm-dot">·</span>Laatst bijgewerkt: <span data-draw="bijgewerkt" data-source="vermeldingen">—</span></span></p>
     </section>
       <div class="nm-logos">
         <span class="nm-camplogo" role="img" aria-label="Week van de Mediawijsheid 2026" data-draw="camplogo" data-source="logo_wvdm2026"></span>
@@ -330,6 +338,8 @@
           <option value="geen-mm">Zonder MediaMasters</option>
         </select>
         <input class="nm-search" type="search" placeholder="Zoek op bron of titel" aria-label="Zoek op bron of titel">
+        <button type="button" class="nm-csv">Download als Excel (CSV)</button>
+        <span class="nm-csv-melding" role="status"></span>
       </div>
       <div class="nm-tablebox">
         <table class="nm-table" data-source="vermeldingen" data-row-key="id">
@@ -356,7 +366,7 @@
         <dt>Social media</dt>
         <dd>Instagram, Facebook en LinkedIn zijn via zoekmachines nauwelijks doorzoekbaar. Tot er via de browser op die platforms is gezocht, zijn de social-cijfers een ondergrens, geen werkelijk aantal.</dd>
         <dt>Opsplitsing bovenaan</dt>
-        <dd>"Week van de Mediawijsheid" en "MediaMasters" tellen samen op tot het totaal: een bericht over de game MediaMasters telt bij MediaMasters, de rest bij de Week van de Mediawijsheid. "#wvdm" telt de vermeldingen met #wvdm of #WvdM2026 en overlapt met beide.</dd>
+        <dd>"Week van de Mediawijsheid" en "MediaMasters" tellen samen op tot het totaal. Een bericht over de game MediaMasters telt bij MediaMasters, de rest telt bij de Week van de Mediawijsheid. Hoe vaak #wvdm en #WvdM2026 gebruikt zijn, zie je bij "Gebruikte hashtags en tags".</dd>
         <dt>Hashtags en tags</dt>
         <dd>Altijd meegeteld: #wvdm, #WvdM2026, #weekvandemediawijsheid, #gezondmetjescherm, #mediamasters, #mediamastersnl, #iedereenmediawijs, @iedereenmediawijs en @mediamastersnl. Alleen in combinatie met de campagne: #mediawijsheid, #schermtijd en #digitalebalans. Hashtags worden vooral op social media gebruikt, dus deze aantallen groeien pas als daar gezocht is.</dd>
         <dt>Datum</dt>
@@ -515,12 +525,61 @@
   };
 
   window.nmFilter = { kanaal: '', thema: '', q: '' };
+
+  // de berichten volgens het huidige filter, nieuwste eerst (voor de tabel en de download)
+  window.nmSelectie = (alle) => {
+    const f = window.nmFilter || { kanaal: '', thema: '', q: '' };
+    return alle
+      .filter((r) => r.onderwerp === 'Week van de Mediawijsheid 2026')
+      .filter((r) => !f.kanaal || r.kanaal === f.kanaal)
+      .filter((r) => !f.thema || (f.thema === 'mm' ? r.mediamasters === true : r.mediamasters !== true))
+      .filter((r) => !f.q || (String(r.bron) + ' ' + String(r.titel) + ' ' + String(r.soort)).toLowerCase().includes(f.q))
+      .slice()
+      .sort((a, b) => (b.datum || '').localeCompare(a.datum || ''));
+  };
+
+  // download als CSV (Excel, puntkomma's, UTF-8 met BOM voor de Nederlandse tekens)
+  document.querySelectorAll('.nm-csv').forEach((knop) => knop.addEventListener('click', () => {
+    const melding = knop.parentElement.querySelector('.nm-csv-melding');
+    const d = dash.data('vermeldingen');
+    if (d.status !== 'ok') { if (melding) melding.textContent = 'De gegevens zijn nog niet geladen.'; return; }
+    const kolommen = [['Bericht', 'titel'], ['Link', 'url'], ['Bron', 'bron'], ['Datum', 'datum'], ['Datum (tekst)', 'datum_label'], ['Kanaal', 'kanaal'], ['Soort', 'soort'], ['MediaMasters', 'mediamasters'], ['Hashtags', 'hashtags'], ['Samenvatting', 'samenvatting'], ['Gevonden op', 'gevonden_op']];
+    const cel = (v) => {
+      let s = v === true ? 'ja' : v === false ? 'nee' : (v == null ? '' : String(v));
+      if (/^[=+\-@]/.test(s)) s = "'" + s;
+      return /[";\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    };
+    const rijen = window.nmSelectie(d.data);
+    const tekst = [kolommen.map((k) => k[0]).join(';')].concat(rijen.map((r) => kolommen.map((k) => cel(r[k[1]])).join(';'))).join('\r\n');
+    try {
+      const blob = new Blob(['\ufeff' + tekst], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'week-van-de-mediawijsheid-2026-vermeldingen.csv';
+      document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      if (melding) melding.textContent = rijen.length + ' berichten gedownload.';
+    } catch (e) { if (melding) melding.textContent = 'Downloaden lukt hier niet. Probeer het op nmdashboard.oirik.com.'; }
+  }));
   document.querySelectorAll('.nm-kanaal').forEach((s) => s.addEventListener('change', () => { window.nmFilter.kanaal = s.value; dash.draw('tabel'); }));
   document.querySelectorAll('.nm-thema').forEach((s) => s.addEventListener('change', () => { window.nmFilter.thema = s.value; dash.draw('tabel'); }));
   document.querySelectorAll('.nm-search').forEach((s) => s.addEventListener('input', () => { window.nmFilter.q = s.value.trim().toLowerCase(); dash.draw('tabel'); }));
 </script>
 
 <script>
+  // laatst bijgewerkt: tijdstip van het gegevensbestand (op de eigen site), anders de datum van de laatste zoekronde
+  dash.draw('bijgewerkt', (el) => {
+    const d = dash.data('vermeldingen');
+    if (d.status !== 'ok') { el.textContent = '—'; return; }
+    const t = d.bijgewerkt ? new Date(d.bijgewerkt) : null;
+    if (t && !isNaN(t)) {
+      el.textContent = t.toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'Europe/Amsterdam' }).replace('.', '')
+        + ', ' + t.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Amsterdam' });
+      return;
+    }
+    const s = dash.data('wvdm_totaal');
+    el.textContent = s.status === 'ok' && s.data[0] && s.data[0].stand_label ? s.data[0].stand_label : '—';
+  });
+
   dash.draw('kpi', (el) => {
     const d = dash.data(el.dataset.source);
     if (d.status === 'loading') { el.textContent = '—'; return; }
@@ -960,14 +1019,7 @@
     tb.replaceChildren();
     const leeg = document.querySelectorAll('.nm-empty');
     if (d.status !== 'ok') { leeg.forEach((p) => { p.hidden = true; }); return; }
-    const f = window.nmFilter || { kanaal: '', q: '' };
-    const rows = d.data
-      .filter((r) => r.onderwerp === 'Week van de Mediawijsheid 2026')
-      .filter((r) => !f.kanaal || r.kanaal === f.kanaal)
-      .filter((r) => !f.thema || (f.thema === 'mm' ? r.mediamasters === true : r.mediamasters !== true))
-      .filter((r) => !f.q || (String(r.bron) + ' ' + String(r.titel) + ' ' + String(r.soort)).toLowerCase().includes(f.q))
-      .slice()
-      .sort((a, b) => (b.datum || '').localeCompare(a.datum || ''));
+    const rows = window.nmSelectie(d.data);
     rows.forEach((r) => {
       const tr = document.createElement('tr'); tr.dataset.key = r.id;
       const td = (txt, cls) => { const c = document.createElement('td'); if (cls) c.className = cls; c.textContent = txt == null ? '' : String(txt); tr.append(c); return c; };
