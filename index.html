@@ -140,6 +140,24 @@
   .nm-intro .nm-line .nm-fine { font-size: 13px; }
   .nm-foto { color: transparent !important; }
   .nm-foto .nm-letter { display: none; }
+  /* v7: kanaalkleuren, placeholders, groter campagnelogo, lichtere laag, twee kolommen, Instagram-pop-up */
+  .nm-bg::after { background: linear-gradient(90deg, rgba(14,17,22,.52) 0%, rgba(14,17,22,.35) 55%, rgba(14,17,22,.2) 100%); }
+  @media (max-width: 760px) { .nm-bg::after { background: rgba(14,17,22,.45); } }
+  .nm-introrow { justify-content: space-between; }
+  .nm-introrow .nm-intro { flex: 0 1 auto; }
+  .nm-intro .nm-line + .nm-line { margin-top: 2px; }
+  .nm-camplogo { width: 208px; height: 148px; }
+  @media (max-width: 640px) { .nm-camplogo { width: 156px; height: 111px; } }
+  .nm-tlist { display: grid; grid-template-columns: 1fr 1fr; column-gap: 28px; }
+  @media (max-width: 760px) { .nm-tlist { grid-template-columns: 1fr; } }
+  .nm-ttile, .nm-kaart-beeld { text-shadow: 0 1px 6px rgba(0,0,0,.45); }
+  .nm-kaart-beeld .nm-badge { color: #ffffff; text-shadow: none; }
+  .nm-klik { cursor: zoom-in; }
+  .nm-klik:focus-visible { outline: 2px solid #ffffff; outline-offset: 2px; }
+  .nm-pop { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,.72); display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .nm-pop-box { background: #ffffff; border-radius: 12px; width: min(100%, 480px); max-height: 90vh; overflow: auto; position: relative; padding: 12px; font-family: Arial, Helvetica, sans-serif; }
+  .nm-pop-x { position: absolute; top: 6px; right: 8px; border: 0; background: #0e1116; color: #ffffff; width: 34px; height: 34px; border-radius: 50%; font-size: 20px; line-height: 1; cursor: pointer; z-index: 2; }
+  .nm-pop-link { display: block; text-align: center; margin: 8px 0 2px; color: #145ecc; font-size: 15px; }
   [data-dash-source-state=empty] { color: transparent; }
   [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
 </style>
@@ -162,16 +180,18 @@
   <div class="nm-topic" data-onderwerp="wvdm2026">
     <div class="nm-introrow">
     <section class="nm-intro" id="samenvatting">
-      <p class="nm-line">Vermeldingen tot <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="stand_label">—</b>: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="totaal">—</b><span class="nm-dot">·</span>Week van de Mediawijsheid: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="wvdm_aantal">—</b><span class="nm-dot">·</span>#wvdm: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="hashtag_totaal">—</b><span class="nm-dot">·</span>MediaMasters: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="mm_totaal">—</b><span class="nm-dot">·</span>Drukste dag: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_datum_label">—</b>, <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_aantal">—</b> vermeldingen<span class="nm-dot">·</span><span class="nm-fine">Deze vermeldingen kunnen foutmarges bevatten.</span></p>
+      <p class="nm-line">Vermeldingen tot <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="stand_label">—</b>: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="totaal">—</b><span class="nm-dot">·</span>Week van de Mediawijsheid: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="wvdm_aantal">—</b><span class="nm-dot">·</span>#wvdm: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="hashtag_totaal">—</b><span class="nm-dot">·</span>MediaMasters: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="mm_totaal">—</b></p>
+      <p class="nm-line">Drukste dag: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_datum_label">—</b>, <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_aantal">—</b> vermeldingen</p>
+      <p class="nm-line"><span class="nm-fine">Deze vermeldingen kunnen foutmarges bevatten.</span></p>
     </section>
       <span class="nm-camplogo" role="img" aria-label="Week van de Mediawijsheid 2026" data-draw="camplogo" data-source="logo_wvdm2026"></span>
     </div>
 
     <section class="nm-feed" id="berichten-feed">
       <h2>Meest recent</h2>
-      <div class="nm-recent dash-skeleton" data-draw="recent" data-source="wvdm_recent"></div>
+      <div class="nm-recent dash-skeleton" data-draw="recent" data-source="wvdm_recent ph1 ph2 ph3 ph4"></div>
       <div class="nm-ticker-wrap">
-        <div class="nm-ticker dash-skeleton" data-draw="ticker" data-source="wvdm_overig" tabindex="0" aria-label="Overige berichten, schuift automatisch. Muis erop om te stoppen."></div>
+        <div class="nm-ticker dash-skeleton" data-draw="ticker" data-source="wvdm_overig ph1 ph2 ph3 ph4" tabindex="0" aria-label="Overige berichten, schuift automatisch. Muis erop om te stoppen."></div>
       </div>
     </section>
 
@@ -285,7 +305,7 @@
 
 <script>
   window.NM_KANALEN = ['Website', 'Instagram', 'Facebook', 'LinkedIn'];
-  window.NM_COLORS = ['#5aa9ff', '#f472b6', '#fbbf24', '#34d399', '#c084fc'];
+  window.NM_COLORS = ['#ec1162', '#f97316', '#145ecc', '#00a4ff', '#c084fc']; // Website, Instagram, Facebook, LinkedIn, MediaMasters
   window.NM_TAGS = ['#wvdm', '#wvdm2026', '#weekvandemediawijsheid', '#gezondmetjescherm', '#mediamasters', '#mediamastersnl', '#iedereenmediawijs', '@iedereenmediawijs', '@mediamastersnl', '#mediawijsheid', '#schermtijd'];
 
   dash.calc('wvdm_per_kanaal', {
@@ -437,12 +457,53 @@
     el.style.backgroundImage = d.status === 'ok' && typeof d.data === 'string' && d.data.startsWith('data:image/') ? `url("${d.data.trim()}")` : 'none';
   });
 
+  // placeholderbeeld per bericht (vast gekozen uit vier campagnebeelden)
+  window.nmPh = (id) => {
+    let h = 0; for (const c of String(id)) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+    const d = dash.data('ph' + (1 + (h % 4)));
+    return d.status === 'ok' && typeof d.data === 'string' && d.data.startsWith('data:image/') ? d.data.trim() : '';
+  };
+
+  // Instagram-pop-up met de officiële weergave (alleen op de eigen site, NM_EMBED)
+  window.nmIgPopup = (url) => {
+    document.querySelectorAll('.nm-pop').forEach((p) => p.remove());
+    window.NM_PAUSED = true;
+    const pop = document.createElement('div'); pop.className = 'nm-pop';
+    pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-modal', 'true'); pop.setAttribute('aria-label', 'Instagram-post');
+    const box = document.createElement('div'); box.className = 'nm-pop-box';
+    const x = document.createElement('button'); x.type = 'button'; x.className = 'nm-pop-x'; x.setAttribute('aria-label', 'Sluiten'); x.textContent = '×';
+    const bq = document.createElement('blockquote'); bq.className = 'instagram-media';
+    bq.setAttribute('data-instgrm-permalink', url); bq.setAttribute('data-instgrm-version', '14');
+    bq.style.margin = '0 auto'; bq.style.minWidth = '0'; bq.style.width = '100%';
+    const a = document.createElement('a'); a.className = 'nm-pop-link'; a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = 'Bekijk op Instagram';
+    box.append(x, bq, a); pop.append(box); document.body.append(pop);
+    const onKey = (e) => { if (e.key === 'Escape') close(); };
+    const close = () => { pop.remove(); window.NM_PAUSED = false; document.removeEventListener('keydown', onKey); };
+    x.addEventListener('click', close);
+    pop.addEventListener('click', (e) => { if (e.target === pop) close(); });
+    document.addEventListener('keydown', onKey);
+    x.focus();
+    const run = () => { if (window.instgrm && window.instgrm.Embeds) window.instgrm.Embeds.process(); };
+    if (window.instgrm) run();
+    else if (!document.querySelector('script[data-nm-ig]')) {
+      const s = document.createElement('script'); s.async = true; s.src = 'https://www.instagram.com/embed.js'; s.setAttribute('data-nm-ig', '1'); s.onload = run; document.body.append(s);
+    } else setTimeout(run, 800);
+  };
+
   window.nmTile = (r, cls) => {
     const kleur = window.NM_COLORS[Math.max(0, window.NM_KANALEN.indexOf(r.kanaal))];
     const t = document.createElement('div'); t.className = cls;
     const foto = window.NM_IMAGES && typeof r.afbeelding === 'string' && r.afbeelding.startsWith('https://') ? r.afbeelding.replace(/["'()\s\\]/g, encodeURIComponent) : '';
-    t.style.background = (foto ? `center / cover no-repeat url("${foto}"), ` : '') + `linear-gradient(135deg, ${kleur}, ${kleur}66)`;
+    const ph = foto ? '' : window.nmPh(r.id);
+    t.style.background = foto ? `center / cover no-repeat url("${foto}"), ${kleur}`
+      : (ph ? `linear-gradient(rgba(10,12,16,.5), rgba(10,12,16,.5)), center / cover no-repeat url("${ph}"), ${kleur}` : `linear-gradient(135deg, ${kleur}, ${kleur}66)`);
     if (foto) t.classList.add('nm-foto');
+    if (window.NM_EMBED && r.kanaal === 'Instagram' && typeof r.url === 'string' && r.url.startsWith('https://www.instagram.com/')) {
+      t.classList.add('nm-klik'); t.setAttribute('role', 'button'); t.tabIndex = 0; t.setAttribute('aria-label', 'Bekijk de Instagram-post');
+      const open = (e) => { e.preventDefault(); window.nmIgPopup(r.url); };
+      t.addEventListener('click', open);
+      t.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') open(e); });
+    }
     t.textContent = String(r.bron || '?').replace(/^www\./, '').charAt(0).toUpperCase();
     return t;
   };
@@ -470,7 +531,7 @@
     el.addEventListener('scroll', onScroll, { passive: true });
     const tick = (now) => {
       const dt = st.last ? Math.min(0.1, (now - st.last) / 1000) : 0; st.last = now;
-      if (!st.reduce && st.loop && st.half > 0 && !st.paused && now > st.userUntil) {
+      if (!st.reduce && st.loop && st.half > 0 && !st.paused && !window.NM_PAUSED && now > st.userUntil) {
         st.pos += SPEED * dt;
         if (st.pos >= st.half) st.pos -= st.half;
         if (Math.abs(el[P] - st.pos) >= 0.5) { st.prog = true; el[P] = st.pos; }
@@ -497,6 +558,7 @@
     const letter = document.createElement('span'); letter.className = 'nm-letter';
     letter.textContent = String(r.bron || '?').replace(/^www\./, '').charAt(0).toUpperCase();
     const badge = document.createElement('span'); badge.className = 'nm-badge'; badge.textContent = r.kanaal;
+    badge.style.background = window.NM_COLORS[Math.max(0, window.NM_KANALEN.indexOf(r.kanaal))];
     beeld.append(letter, badge);
     const body = document.createElement('div'); body.className = 'nm-kaart-body';
     const meta = document.createElement('div'); meta.className = 'nm-kaart-meta'; meta.textContent = r.bron + ' · ' + r.datum_label;
@@ -544,7 +606,7 @@
     mount: (el) => {
       const st = { paused: false, userUntil: 0, last: 0, prog: false, raf: 0, loop: false, pos: 0 };
       const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const SPEED = 30; // pixels per seconde
+      const SPEED = 18; // pixels per seconde
       const onEnter = () => { st.paused = true; };
       const onLeave = () => { st.paused = false; st.pos = el.scrollTop; };
       const onTouch = () => { st.paused = true; st.userUntil = performance.now() + 4000; };
@@ -559,7 +621,7 @@
       el.addEventListener('scroll', onScroll, { passive: true });
       const tick = (now) => {
         const dt = st.last ? Math.min(0.1, (now - st.last) / 1000) : 0; st.last = now;
-        if (!reduce && st.loop && !st.paused && now > st.userUntil) {
+        if (!reduce && st.loop && !st.paused && !window.NM_PAUSED && now > st.userUntil) {
           const half = el.scrollHeight / 2;
           st.pos += SPEED * dt;
           if (st.pos >= half) st.pos -= half;
@@ -595,7 +657,7 @@
         return;
       }
       const lijst = (copy) => {
-        const box = document.createElement('div');
+        const box = document.createElement('div'); box.className = 'nm-tlist';
         if (copy) box.setAttribute('aria-hidden', 'true');
         d.data.forEach((r) => {
           const row = document.createElement('div'); row.className = 'nm-trow';
