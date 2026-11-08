@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trends Dashboard – Netwerk Mediawijsheid</title>
+<meta name="description" content="Hoe leeft de Week van de Mediawijsheid in het land? Vermeldingen op websites en social media, dagelijks bijgewerkt.">
+<link rel="icon" href="assets/logo.svg">
+<style>
+  html, body { margin: 0; background: #0e1116; }
+  :root { --cds-dur-slow: .4s; }
+  .dash-select { -webkit-appearance: none; appearance: none; border: 1px solid #4a5361; border-radius: 8px; padding: 8px 40px 8px 12px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23b3bcc9' stroke-width='2'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; cursor: pointer; }
+  @keyframes nm-pulse { 0%, 100% { opacity: .35; } 50% { opacity: .7; } }
+  .dash-skeleton { animation: nm-pulse 1.4s ease-in-out infinite; }
+  .nm-recent.dash-skeleton:empty, .nm-ticker.dash-skeleton:empty, .nm-chart.dash-skeleton:empty, .nm-tags.dash-skeleton:empty { background: rgba(255,255,255,.05); border-radius: 10px; }
+  @media (prefers-reduced-motion: reduce) { .dash-skeleton { animation: none; } }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="assets/dash-shim.js"></script>
+</head>
+<body>
+<div id="dash-root">
+<style>
+  #dash-root { --dash-gutter: 0; }
+  .nm-page {
+    --nm-bg: #0e1116; --nm-panel: #181c23; --nm-panel2: #20252e; --nm-line: #2b313c; --nm-fg: #f3f5f8; --nm-muted: #b3bcc9; --nm-axis: #4a5361;
+    font-family: Arial, Helvetica, sans-serif; color: var(--nm-fg); background: var(--nm-bg);
+    font-size: 18px; line-height: 1.5; display: grid; gap: 24px; padding: 28px clamp(14px, 3vw, 40px) 40px;
+  }
+  .nm-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+  .nm-top h1 { font-family: Arial, Helvetica, sans-serif; font-weight: 700; font-size: clamp(26px, 3.6vw, 36px); line-height: 1.2; margin: 0; }
+  .nm-pick { display: flex; align-items: center; gap: 10px; font-size: 17px; color: var(--nm-muted); }
+  .nm-page .dash-select { background-color: #232833; color: var(--nm-fg); border-color: var(--nm-axis); font-family: Arial, Helvetica, sans-serif; font-size: 18px; min-height: 44px; }
+  .nm-topic { display: grid; gap: 24px; }
+  .nm-intro { background: var(--nm-panel); border: 1px solid var(--nm-line); border-radius: 10px; padding: 22px 24px; }
+  .nm-intro p { margin: 0; }
+  .nm-intro .nm-big { font-size: clamp(26px, 3.4vw, 34px); font-weight: 700; line-height: 1.2; margin-bottom: 10px; }
+  .nm-intro .nm-big .nm-v { font-size: clamp(44px, 6vw, 64px); color: #ffffff; font-variant-numeric: tabular-nums; vertical-align: -0.08em; }
+  .nm-intro .nm-small { font-size: 17px; color: var(--nm-muted); line-height: 1.6; }
+  .nm-intro .nm-small b { color: var(--nm-fg); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .nm-intro .nm-dot { margin: 0 8px; opacity: .6; }
+  .nm-intro .nm-fine { font-size: 14px; color: var(--nm-muted); margin-top: 8px; opacity: .85; }
+  .nm-tags { display: grid; gap: 8px; min-height: 120px; }
+  .nm-tagrow { display: grid; grid-template-columns: minmax(8rem, 12rem) 1fr 2.5rem; align-items: center; gap: 10px; font-size: 16px; }
+  .nm-tagrow .nm-tagname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nm-tagrow .nm-bar { height: 12px; border-radius: 3px; background: var(--nm-panel2); position: relative; overflow: hidden; }
+  .nm-tagrow .nm-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: #5aa9ff; }
+  .nm-tagrow .nm-tagn { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+  .nm-section-title { font-size: 26px; font-weight: 700; margin: 0 0 4px; }
+  .nm-note { font-size: 16px; color: var(--nm-muted); margin: 0 0 16px; }
+  .nm-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: 16px; min-height: 260px; }
+  .nm-kaart { background: var(--nm-panel); border: 1px solid var(--nm-line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+  .nm-kaart-beeld { height: 120px; display: flex; align-items: center; justify-content: center; position: relative; }
+  .nm-kaart-beeld .nm-letter { font-size: 56px; font-weight: 700; color: rgba(255,255,255,.92); line-height: 1; }
+  .nm-kaart-beeld .nm-badge { position: absolute; left: 12px; bottom: 10px; font-size: 14px; font-weight: 700; background: rgba(0,0,0,.45); color: #fff; padding: 2px 8px; border-radius: 999px; }
+  .nm-kaart-body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; }
+  .nm-kaart-meta { font-size: 15px; color: var(--nm-muted); }
+  .nm-kaart-titel { font-size: 19px; font-weight: 700; line-height: 1.3; color: #ffffff; text-decoration: none; }
+  .nm-kaart-titel:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .nm-kaart-tekst { font-size: 16px; color: var(--nm-muted); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 0; }
+  .nm-compact { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: 16px; align-items: start; }
+  .nm-card { background: var(--nm-panel); border: 1px solid var(--nm-line); border-radius: 10px; padding: 18px; min-width: 0; }
+  .nm-card h2 { font-size: 20px; font-weight: 700; margin: 0 0 6px; }
+  .nm-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr)); gap: 10px; }
+  .nm-tile { background: var(--nm-panel2); border-radius: 8px; padding: 12px 14px; }
+  .nm-tile .nm-label { font-size: 16px; color: var(--nm-muted); display: flex; align-items: center; gap: 8px; }
+  .nm-tile .nm-num { font-weight: 700; font-size: 32px; line-height: 1.15; font-variant-numeric: tabular-nums; margin-top: 4px; min-height: 1.15em; color: #ffffff; }
+  .nm-tile .nm-sub { font-size: 14px; color: var(--nm-muted); }
+  .nm-swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; flex: none; }
+  .nm-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 15px; color: var(--nm-fg); margin-bottom: 8px; }
+  .nm-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .nm-chart { position: relative; min-height: 220px; }
+  .nm-chart svg text { font-family: Arial, Helvetica, sans-serif; font-size: 14px; fill: var(--nm-muted); }
+  .nm-tip { position: absolute; pointer-events: none; background: #232833; border: 1px solid var(--nm-axis); border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.45); padding: 10px 12px; font-size: 15px; color: var(--nm-fg); white-space: nowrap; z-index: 2; }
+  .nm-tip .nm-tip-date { color: var(--nm-muted); margin-bottom: 4px; }
+  .nm-tip .nm-tip-row { display: flex; align-items: center; gap: 8px; font-variant-numeric: tabular-nums; }
+  .nm-fail { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 220px; color: var(--nm-muted); font-size: 16px; }
+  .nm-fail i { width: 8px; height: 8px; border-radius: 50%; background: #ff6b6b; display: inline-block; }
+  .nm-lijst > summary, .nm-details > summary { cursor: pointer; font-weight: 700; font-size: 19px; }
+  .nm-controls { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0; }
+  .nm-search { flex: 1 1 14rem; min-width: 0; font-family: Arial, Helvetica, sans-serif; font-size: 17px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--nm-axis); border-radius: 8px; background: #232833; color: var(--nm-fg); box-sizing: border-box; }
+  .nm-search::placeholder { color: var(--nm-muted); }
+  .nm-tablebox { max-height: 34rem; overflow: auto; }
+  .nm-table { width: 100%; border-collapse: collapse; font-size: 16px; }
+  .nm-table th { position: sticky; top: 0; background: var(--nm-panel); text-align: left; font-size: 15px; color: var(--nm-muted); font-weight: 700; padding: 8px 10px; border-bottom: 2px solid var(--nm-line); }
+  .nm-table td { padding: 9px 10px; border-bottom: 1px solid var(--nm-line); vertical-align: top; }
+  .nm-table td:first-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .nm-table a { color: #8cc4ff; text-decoration: underline; text-underline-offset: 3px; }
+  .nm-empty { color: var(--nm-muted); font-size: 16px; margin: 12px 0 0; }
+  @media (max-width: 640px) { .nm-table .nm-hide { display: none; } .nm-intro p { font-size: 19px; } }
+  .nm-details dl { font-size: 16px; margin: 12px 0 0; }
+  .nm-details dt { font-weight: 700; margin-top: 14px; }
+  .nm-details dd { margin: 0; color: var(--nm-muted); }
+  /* v4: logo, achtergrondfoto, Meest recent + lichtkrant */
+  .nm-page { position: relative; isolation: isolate; overflow: hidden; --nm-panel: rgba(24,28,35,.84); --nm-panel2: rgba(36,41,51,.78); --nm-pink: #ec1162; }
+  .nm-bg { position: absolute; left: 0; right: 0; top: 0; height: min(100%, 980px); z-index: -1; background-repeat: no-repeat; background-size: cover; background-position: right top; }
+  .nm-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(14,17,22,.94) 0%, rgba(14,17,22,.82) 40%, rgba(14,17,22,.45) 75%, rgba(14,17,22,.35) 100%), linear-gradient(180deg, rgba(14,17,22,0) 55%, #0e1116 100%); }
+  @media (max-width: 760px) { .nm-bg { height: 520px; background-position: 70% top; } .nm-bg::after { background: linear-gradient(180deg, rgba(14,17,22,.55) 0%, rgba(14,17,22,.8) 55%, #0e1116 100%); } }
+  .nm-card, .nm-intro, .nm-feed { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  .nm-brand { display: flex; align-items: center; gap: 16px; min-width: 0; }
+  .nm-brand .nm-logo { width: 150px; height: 66px; flex: none; margin-left: -10px; background: no-repeat left center / contain; }
+  @media (max-width: 520px) { .nm-brand .nm-logo { width: 116px; height: 52px; } }
+  .nm-brand .nm-divider { width: 1px; align-self: stretch; background: rgba(255,255,255,.25); margin: 10px 0; }
+  .nm-feed { background: var(--nm-panel); border: 1px solid var(--nm-line); border-top: 3px solid var(--nm-pink); border-radius: 12px; padding: 20px; display: grid; gap: 18px; }
+  .nm-feed h2 { color: var(--nm-pink); font-size: 24px; font-weight: 700; margin: 0; }
+  .nm-recent { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 14px; min-height: 230px; }
+  .nm-recent .nm-kaart { background: var(--nm-panel2); }
+  .nm-ticker-wrap { position: relative; border-top: 1px solid var(--nm-line); padding-top: 12px; }
+  .nm-ticker-wrap::before, .nm-ticker-wrap::after { content: ""; position: absolute; left: 0; right: 12px; height: 28px; pointer-events: none; z-index: 1; }
+  .nm-ticker-wrap::before { top: 12px; background: linear-gradient(180deg, rgba(24,28,35,.95), rgba(24,28,35,0)); }
+  .nm-ticker-wrap::after { bottom: 0; background: linear-gradient(0deg, rgba(24,28,35,.95), rgba(24,28,35,0)); }
+  .nm-ticker { height: 340px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #4a5361 transparent; }
+  .nm-trow { display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center; padding: 9px 4px; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .nm-trow .nm-ttile { width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; color: #fff; }
+  .nm-trow a, .nm-trow .nm-ttitel { color: #ffffff; font-size: 17px; font-weight: 700; line-height: 1.3; text-decoration: none; display: block; }
+  .nm-trow a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .nm-trow .nm-tdatum { font-size: 14px; color: var(--nm-muted); margin-top: 2px; }
+  [data-dash-source-state=empty] { color: transparent; }
+  [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+</style>
+
+<div class="nm-page">
+  <div class="nm-bg" data-onderwerp="wvdm2026" data-draw="bg" data-source="bg_wvdm2026"></div>
+  <header class="nm-top">
+    <div class="nm-brand">
+      <span class="nm-logo" role="img" aria-label="Netwerk Mediawijsheid" data-draw="logo" data-source="logo"></span>
+      <span class="nm-divider"></span>
+      <h1>Trends Dashboard</h1>
+    </div>
+    <label class="nm-pick">Onderwerp
+      <select class="dash-select nm-onderwerp" aria-label="Onderwerp">
+        <option value="wvdm2026">Week van de Mediawijsheid 2026</option>
+      </select>
+    </label>
+  </header>
+
+  <div class="nm-topic" data-onderwerp="wvdm2026">
+    <section class="nm-intro" id="samenvatting">
+      <p class="nm-big">Vermeldingen tot <span class="dash-skeleton" data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="stand_label">—</span>: <span class="nm-v dash-skeleton" data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="totaal">—</span></p>
+      <p class="nm-small">Week van de Mediawijsheid: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="wvdm_aantal">—</b><span class="nm-dot">·</span>#wvdm: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="hashtag_totaal">—</b><span class="nm-dot">·</span>MediaMasters: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="mm_totaal">—</b></p>
+      <p class="nm-small">Drukste dag: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_datum_label">—</b>, <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="piek_aantal">—</b> vermeldingen<span class="nm-dot">·</span>Drukste dag #wvdm: <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="hashtag_piek_datum_label">—</b>, <b data-draw="kpi" data-source="wvdm_totaal" data-row="0" data-field="hashtag_piek_aantal">—</b> vermeldingen</p>
+      <p class="nm-fine">Deze vermeldingen kunnen foutmarges bevatten.</p>
+    </section>
+
+    <section class="nm-feed" id="berichten-feed">
+      <h2>Meest recent</h2>
+      <div class="nm-recent dash-skeleton" data-draw="recent" data-source="wvdm_recent"></div>
+      <div class="nm-ticker-wrap">
+        <div class="nm-ticker dash-skeleton" data-draw="ticker" data-source="wvdm_overig" tabindex="0" aria-label="Overige berichten, schuift automatisch. Muis erop om te stoppen."></div>
+      </div>
+    </section>
+
+    <div class="nm-compact">
+      <section class="nm-card" id="kanalen">
+        <h2>Per kanaal</h2>
+        <p class="nm-note">Totaal gevonden, en hoeveel sinds de start op 6 november.</p>
+        <div class="nm-tiles">
+          <div class="nm-tile">
+            <div class="nm-label"><i class="nm-swatch" data-i="0"></i>Websites</div>
+            <div class="nm-num dash-skeleton" data-draw="kpi" data-source="wvdm_per_kanaal" data-field="totaal" data-where="kanaal=Website">—</div>
+            <div class="nm-sub"><span data-draw="kpi" data-source="wvdm_per_kanaal" data-field="campagneweek" data-where="kanaal=Website">—</span> sinds 6 nov</div>
+          </div>
+          <div class="nm-tile">
+            <div class="nm-label"><i class="nm-swatch" data-i="1"></i>Instagram</div>
+            <div class="nm-num dash-skeleton" data-draw="kpi" data-source="wvdm_per_kanaal" data-field="totaal" data-where="kanaal=Instagram">—</div>
+            <div class="nm-sub"><span data-draw="kpi" data-source="wvdm_per_kanaal" data-field="campagneweek" data-where="kanaal=Instagram">—</span> sinds 6 nov</div>
+          </div>
+          <div class="nm-tile">
+            <div class="nm-label"><i class="nm-swatch" data-i="2"></i>Facebook</div>
+            <div class="nm-num dash-skeleton" data-draw="kpi" data-source="wvdm_per_kanaal" data-field="totaal" data-where="kanaal=Facebook">—</div>
+            <div class="nm-sub"><span data-draw="kpi" data-source="wvdm_per_kanaal" data-field="campagneweek" data-where="kanaal=Facebook">—</span> sinds 6 nov</div>
+          </div>
+          <div class="nm-tile">
+            <div class="nm-label"><i class="nm-swatch" data-i="3"></i>LinkedIn</div>
+            <div class="nm-num dash-skeleton" data-draw="kpi" data-source="wvdm_per_kanaal" data-field="totaal" data-where="kanaal=LinkedIn">—</div>
+            <div class="nm-sub"><span data-draw="kpi" data-source="wvdm_per_kanaal" data-field="campagneweek" data-where="kanaal=LinkedIn">—</span> sinds 6 nov</div>
+          </div>
+          <div class="nm-tile">
+            <div class="nm-label"><i class="nm-swatch" data-i="4"></i>MediaMasters</div>
+            <div class="nm-num dash-skeleton" data-draw="kpi" data-source="wvdm_totaal" data-field="mm_totaal" data-row="0">—</div>
+            <div class="nm-sub"><span data-draw="kpi" data-source="wvdm_totaal" data-field="mm_campagneweek" data-row="0">—</span> sinds 6 nov, alle kanalen</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="nm-card" id="per-dag">
+        <h2>Vermeldingen per dag</h2>
+        <p class="nm-note">26 okt t/m 13 nov, op publicatiedatum. De laatste dagen lopen achter.</p>
+        <div class="nm-legend">
+          <span><i class="nm-swatch" data-i="0"></i>Websites</span>
+          <span><i class="nm-swatch" data-i="1"></i>Instagram</span>
+          <span><i class="nm-swatch" data-i="2"></i>Facebook</span>
+          <span><i class="nm-swatch" data-i="3"></i>LinkedIn</span>
+        </div>
+        <div class="nm-chart dash-skeleton" data-draw="chart" data-source="wvdm_per_dag"></div>
+      </section>
+
+      <section class="nm-card" id="hashtags">
+        <h2>Gebruikte hashtags en tags</h2>
+        <p class="nm-note">Aantal vermeldingen per hashtag of tag. Telt vanaf de eerste zoekronde op social media. #mediawijsheid en #schermtijd tellen alleen mee als het bericht ook over de campagne gaat.</p>
+        <div class="nm-tags dash-skeleton" data-draw="hashtags" data-source="wvdm_hashtags"></div>
+      </section>
+    </div>
+
+    <details class="nm-card nm-lijst" id="berichten">
+      <summary>Alle berichten tonen (lijst met links)</summary>
+      <div class="nm-controls">
+        <select class="dash-select nm-kanaal" aria-label="Kanaal">
+          <option value="">Alle kanalen</option>
+          <option value="Website">Websites</option>
+          <option value="Instagram">Instagram</option>
+          <option value="Facebook">Facebook</option>
+          <option value="LinkedIn">LinkedIn</option>
+        </select>
+        <select class="dash-select nm-thema" aria-label="Thema">
+          <option value="">Alle berichten</option>
+          <option value="mm">Alleen MediaMasters</option>
+          <option value="geen-mm">Zonder MediaMasters</option>
+        </select>
+        <input class="nm-search" type="search" placeholder="Zoek op bron of titel" aria-label="Zoek op bron of titel">
+      </div>
+      <div class="nm-tablebox">
+        <table class="nm-table" data-source="vermeldingen" data-row-key="id">
+          <thead>
+            <tr>
+              <th data-field="datum_label">Datum</th>
+              <th data-field="kanaal">Kanaal</th>
+              <th data-field="bron">Bron</th>
+              <th data-field="titel">Bericht (link)</th>
+              <th class="nm-hide" data-field="soort">Soort</th>
+            </tr>
+          </thead>
+          <tbody data-draw="tabel"></tbody>
+        </table>
+      </div>
+      <p class="nm-empty" hidden>Geen vermeldingen gevonden voor deze selectie.</p>
+    </details>
+
+    <details class="nm-card nm-details" id="methode">
+      <summary>Hoe deze cijfers tot stand komen</summary>
+      <dl>
+        <dt>Wat telt als vermelding</dt>
+        <dd>Een openbare webpagina of social-post die de Week van de Mediawijsheid 2026 noemt, gevonden via webzoekopdrachten en, vanaf de eerste zoekronde daar, via zoeken op social media in de eigen browser.</dd>
+        <dt>Social media</dt>
+        <dd>Instagram, Facebook en LinkedIn zijn via zoekmachines nauwelijks doorzoekbaar. Tot er via de browser op die platforms is gezocht, zijn de social-cijfers een ondergrens, geen werkelijk aantal.</dd>
+        <dt>Opsplitsing bovenaan</dt>
+        <dd>"Week van de Mediawijsheid" en "MediaMasters" tellen samen op tot het totaal: een bericht over de game MediaMasters telt bij MediaMasters, de rest bij de Week van de Mediawijsheid. "#wvdm" telt de vermeldingen met #wvdm of #WvdM2026 en overlapt met beide.</dd>
+        <dt>Hashtags en tags</dt>
+        <dd>Altijd meegeteld: #wvdm, #WvdM2026, #weekvandemediawijsheid, #gezondmetjescherm, #mediamasters, #mediamastersnl, #iedereenmediawijs, @iedereenmediawijs en @mediamastersnl. Alleen in combinatie met de campagne: #mediawijsheid en #schermtijd. Hashtags worden vooral op social media gebruikt, dus deze aantallen groeien pas als daar gezocht is.</dd>
+        <dt>Datum</dt>
+        <dd>De publicatiedatum van de pagina of post. Agenda- en informatiepagina's hebben vaak geen datum: die tellen mee in de totalen, maar niet in de grafiek per dag; in de lichtkrant staan ze achteraan.</dd>
+        <dt>Meest recent en lichtkrant</dt>
+        <dd>Bovenaan de drie nieuwste vermeldingen met datum, met een korte eigen samenvatting (geen citaat uit het bericht). Daaronder schuiven alle overige vermeldingen voorbij; doorplaatsingen van hetzelfde bericht staan alleen in de volledige lijst.</dd>
+        <dt>Wat ontbreekt</dt>
+        <dd>De eigen campagnepagina's op netwerkmediawijsheid.nl, mediawijsheid.nl en weekvandemediawijsheid.nl, en X, TikTok en YouTube.</dd>
+      </dl>
+    </details>
+  </div>
+</div>
+
+<script>
+  window.NM_KANALEN = ['Website', 'Instagram', 'Facebook', 'LinkedIn'];
+  window.NM_COLORS = ['#5aa9ff', '#f472b6', '#fbbf24', '#34d399', '#c084fc'];
+  window.NM_TAGS = ['#wvdm', '#wvdm2026', '#weekvandemediawijsheid', '#gezondmetjescherm', '#mediamasters', '#mediamastersnl', '#iedereenmediawijs', '@iedereenmediawijs', '@mediamastersnl', '#mediawijsheid', '#schermtijd'];
+
+  dash.calc('wvdm_per_kanaal', {
+    inputs: ['vermeldingen'],
+    title: 'WvdM 2026: per kanaal',
+    description: 'Aantal vermeldingen van de Week van de Mediawijsheid 2026 per kanaal, totaal en sinds 6 november.',
+    fn: (vermeldingen) => {
+      const v0 = vermeldingen.filter((r) => r.onderwerp === 'Week van de Mediawijsheid 2026');
+      return ['Website', 'Instagram', 'Facebook', 'LinkedIn'].map((kanaal) => {
+        const v = v0.filter((r) => r.kanaal === kanaal);
+        return { kanaal, totaal: v.length, campagneweek: v.filter((r) => r.datum && r.datum >= '2026-11-06' && r.datum <= '2026-11-13').length };
+      });
+    },
+  });
+
+  dash.calc('wvdm_per_dag', {
+    inputs: ['vermeldingen'],
+    title: 'WvdM 2026: per dag',
+    description: 'Aantal vermeldingen met datum per dag en per kanaal, 26 okt t/m 13 nov 2026.',
+    fn: (vermeldingen) => {
+      const v0 = vermeldingen.filter((r) => r.onderwerp === 'Week van de Mediawijsheid 2026');
+      const rows = [];
+      for (let t = Date.UTC(2026, 9, 26); t <= Date.UTC(2026, 10, 13); t += 864e5) {
+        const datum = new Date(t).toISOString().slice(0, 10);
+        const r = { datum, totaal: 0 };
+        for (const k of ['Website', 'Instagram', 'Facebook', 'LinkedIn']) {
+          r[k] = v0.filter((v) => v.datum === datum && v.kanaal === k).length;
+          r.totaal += r[k];
+        }
+        rows.push(r);
+      }
+      return rows;
+    },
+  });
+
+  dash.calc('wvdm_totaal', {
+    inputs: ['vermeldingen'],
+    title: 'WvdM 2026: totalen',
+    description: 'Totaal, opsplitsing (Week van de Mediawijsheid, MediaMasters, #wvdm), stand en drukste dagen.',
+    fn: (vermeldingen) => {
+      const v0 = vermeldingen.filter((r) => r.onderwerp === 'Week van de Mediawijsheid 2026');
+      const tags = (r) => String(r.hashtags || '').toLowerCase().split(/\s+/).filter(Boolean);
+      const piekVan = (rows) => {
+        const telling = {};
+        rows.filter((r) => r.datum).forEach((r) => { telling[r.datum] = (telling[r.datum] || 0) + 1; });
+        const p = Object.entries(telling).sort((a, b) => b[1] - a[1] || b[0].localeCompare(a[0]))[0];
+        const rij = p ? rows.find((r) => r.datum === p[0]) : null;
+        return { label: rij ? rij.datum_label : '', aantal: p ? p[1] : 0 };
+      };
+      const mm = v0.filter((r) => r.mediamasters === true);
+      const tag = v0.filter((r) => tags(r).some((t) => t === '#wvdm' || t === '#wvdm2026'));
+      const stand = v0.filter((r) => r.gevonden_op).sort((a, b) => b.gevonden_op.localeCompare(a.gevonden_op))[0];
+      const a = piekVan(v0), b = piekVan(tag);
+      const inWeek = (r) => r.datum && r.datum >= '2026-11-06' && r.datum <= '2026-11-13';
+      return [{
+        stand_label: stand ? stand.gevonden_op_label : '',
+        totaal: v0.length,
+        wvdm_aantal: v0.length - mm.length,
+        mm_totaal: mm.length,
+        mm_campagneweek: mm.filter(inWeek).length,
+        hashtag_totaal: tag.length,
+        piek_datum_label: a.label,
+        piek_aantal: a.aantal,
+        hashtag_piek_datum_label: b.label,
+        hashtag_piek_aantal: b.aantal,
+      }];
+    },
+  });
+
+  dash.calc('wvdm_hashtags', {
+    inputs: ['vermeldingen'],
+    title: 'WvdM 2026: hashtags en tags',
+    description: 'Aantal vermeldingen per gevolgde hashtag of tag, van veel naar weinig.',
+    fn: (vermeldingen) => {
+      const lijst = ['#wvdm', '#wvdm2026', '#weekvandemediawijsheid', '#gezondmetjescherm', '#mediamasters', '#mediamastersnl', '#iedereenmediawijs', '@iedereenmediawijs', '@mediamastersnl', '#mediawijsheid', '#schermtijd'];
+      const v0 = vermeldingen.filter((r) => r.onderwerp === 'Week van de Mediawijsheid 2026');
+      return lijst.map((tag) => ({ tag, aantal: v0.filter((r) => String(r.hashtags || '').toLowerCase().split(/\s+/).includes(tag)).length }))
+        .sort((a, b) => b.aantal - a.aantal || lijst.indexOf(a.tag) - lijst.indexOf(b.tag));
+    },
+  });
+
+  dash.calc('wvdm_recent', {
+    inputs: ['vermeldingen'],
+    title: 'WvdM 2026: meest recent',
+    description: 'De drie nieuwste vermeldingen met datum, zonder doorplaatsingen.',
+    fn: (vermeldingen) => vermeldingen
+      .filter((r) => r.onderwerp === 'Week van de Mediawijsheid 2026' && r.datum && r.soort !== 'Doorplaatsing')
+      .sort((a, b) => b.datum.localeCompare(a.datum) || b.id.localeCompare(a.id))
+      .slice(0, 3)
+      .map((r) => ({ id: r.id, datum_label: r.datum_label, kanaal: r.kanaal, bron: r.bron, titel: r.titel, samenvatting: r.samenvatting, url: r.url })),
+  });
+
+  dash.calc('wvdm_overig', {
+    inputs: ['wvdm_recent', 'vermeldingen'],
+    title: 'WvdM 2026: overige berichten',
+    description: 'Alle overige vermeldingen voor de lichtkrant: nieuwste eerst, zonder datum achteraan, zonder doorplaatsingen.',
+    fn: (wvdm_recent, vermeldingen) => {
+      const top = new Set(wvdm_recent.map((r) => r.id));
+      return vermeldingen
+        .filter((r) => r.onderwerp === 'Week van de Mediawijsheid 2026' && r.soort !== 'Doorplaatsing' && !top.has(r.id))
+        .sort((a, b) => (b.datum || '').localeCompare(a.datum || '') || b.id.localeCompare(a.id))
+        .map((r) => ({ id: r.id, datum_label: r.datum_label, kanaal: r.kanaal, bron: r.bron, titel: r.titel, url: r.url }));
+    },
+  });
+
+  document.querySelectorAll('.nm-swatch').forEach((s) => { s.style.background = window.NM_COLORS[+s.dataset.i]; });
+
+  document.querySelectorAll('.nm-onderwerp').forEach((sel) => sel.addEventListener('change', () => {
+    document.querySelectorAll('.nm-topic, .nm-bg').forEach((t) => { t.hidden = t.dataset.onderwerp !== sel.value; });
+  }));
+
+  window.nmFilter = { kanaal: '', thema: '', q: '' };
+  document.querySelectorAll('.nm-kanaal').forEach((s) => s.addEventListener('change', () => { window.nmFilter.kanaal = s.value; dash.draw('tabel'); }));
+  document.querySelectorAll('.nm-thema').forEach((s) => s.addEventListener('change', () => { window.nmFilter.thema = s.value; dash.draw('tabel'); }));
+  document.querySelectorAll('.nm-search').forEach((s) => s.addEventListener('input', () => { window.nmFilter.q = s.value.trim().toLowerCase(); dash.draw('tabel'); }));
+</script>
+
+<script>
+  dash.draw('kpi', (el) => {
+    const d = dash.data(el.dataset.source);
+    if (d.status === 'loading') { el.textContent = '—'; return; }
+    el.classList.remove('dash-skeleton');
+    if (d.status !== 'ok') { el.textContent = '—'; return; }
+    let row;
+    if (el.dataset.where) {
+      const [k, v] = el.dataset.where.split('=');
+      row = d.data.find((r) => String(r[k]) === decodeURIComponent(v));
+    } else {
+      row = d.data[+(el.dataset.row || 0)];
+    }
+    const val = row ? row[el.dataset.field] : undefined;
+    el.textContent = val === undefined || val === null || val === '' ? '—' : (typeof val === 'number' ? d3.format(',')(val) : String(val));
+  });
+</script>
+
+<script>
+  // achtergrondfoto en logo komen als data-URL uit hun bron
+  dash.draw('bg', (el) => {
+    const d = dash.data(el.dataset.source);
+    el.style.backgroundImage = d.status === 'ok' && typeof d.data === 'string' && d.data.startsWith('data:image/') ? `url("${d.data.trim()}")` : 'none';
+  });
+  dash.draw('logo', (el) => {
+    const d = dash.data('logo');
+    el.style.backgroundImage = d.status === 'ok' && typeof d.data === 'string' && d.data.startsWith('data:image/') ? `url("${d.data.trim()}")` : 'none';
+  });
+
+  window.nmTile = (r, cls) => {
+    const kleur = window.NM_COLORS[Math.max(0, window.NM_KANALEN.indexOf(r.kanaal))];
+    const t = document.createElement('div'); t.className = cls;
+    t.style.background = `linear-gradient(135deg, ${kleur}, ${kleur}66)`;
+    t.textContent = String(r.bron || '?').replace(/^www\./, '').charAt(0).toUpperCase();
+    return t;
+  };
+  window.nmLink = (r, cls) => {
+    let a;
+    if (typeof r.url === 'string' && r.url.startsWith('https://')) { a = document.createElement('a'); a.href = r.url; a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+    else { a = document.createElement('span'); }
+    a.className = cls; a.textContent = r.titel;
+    return a;
+  };
+
+  // lichtkrant: schuift automatisch, stopt bij muis/aanraking, handmatig scrollen kan
+  dash.draw('ticker', {
+    mount: (el) => {
+      const st = { paused: false, userUntil: 0, last: 0, prog: false, raf: 0, loop: false, pos: 0 };
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const SPEED = 30; // pixels per seconde
+      const onEnter = () => { st.paused = true; };
+      const onLeave = () => { st.paused = false; st.pos = el.scrollTop; };
+      const onTouch = () => { st.paused = true; st.userUntil = performance.now() + 4000; };
+      const onTouchEnd = () => { st.paused = false; st.userUntil = performance.now() + 4000; };
+      const onScroll = () => {
+        if (st.prog) { st.prog = false; return; }
+        st.userUntil = performance.now() + 4000; st.pos = el.scrollTop;
+      };
+      el.addEventListener('mouseenter', onEnter); el.addEventListener('mouseleave', onLeave);
+      el.addEventListener('focusin', onEnter); el.addEventListener('focusout', onLeave);
+      el.addEventListener('touchstart', onTouch, { passive: true }); el.addEventListener('touchend', onTouchEnd);
+      el.addEventListener('scroll', onScroll, { passive: true });
+      const tick = (now) => {
+        const dt = st.last ? Math.min(0.1, (now - st.last) / 1000) : 0; st.last = now;
+        if (!reduce && st.loop && !st.paused && now > st.userUntil) {
+          const half = el.scrollHeight / 2;
+          st.pos += SPEED * dt;
+          if (st.pos >= half) st.pos -= half;
+          if (Math.abs(el.scrollTop - st.pos) >= 0.5) { st.prog = true; el.scrollTop = st.pos; }
+        } else if (st.loop && el.scrollTop >= el.scrollHeight / 2) {
+          st.pos = el.scrollTop - el.scrollHeight / 2; st.prog = true; el.scrollTop = st.pos;
+        }
+        st.raf = requestAnimationFrame(tick);
+      };
+      st.raf = requestAnimationFrame(tick);
+      st.cleanup = () => {
+        cancelAnimationFrame(st.raf);
+        el.removeEventListener('mouseenter', onEnter); el.removeEventListener('mouseleave', onLeave);
+        el.removeEventListener('focusin', onEnter); el.removeEventListener('focusout', onLeave);
+        el.removeEventListener('touchstart', onTouch); el.removeEventListener('touchend', onTouchEnd);
+        el.removeEventListener('scroll', onScroll);
+      };
+      st.reduce = reduce;
+      return st;
+    },
+    update: (el, st) => {
+      const d = dash.data('wvdm_overig');
+      el.replaceChildren();
+      st.loop = false;
+      if (d.status === 'loading') { el.classList.add('dash-skeleton'); return; }
+      el.classList.remove('dash-skeleton');
+      if (d.status !== 'ok') {
+        if (d.status === 'error') {
+          const f = document.createElement('div'); f.className = 'nm-fail';
+          f.append(document.createElement('i'), 'Failed to load');
+          el.append(f);
+        } else { el.textContent = '—'; }
+        return;
+      }
+      const lijst = (copy) => {
+        const box = document.createElement('div');
+        if (copy) box.setAttribute('aria-hidden', 'true');
+        d.data.forEach((r) => {
+          const row = document.createElement('div'); row.className = 'nm-trow';
+          const body = document.createElement('div');
+          const a = window.nmLink(r, 'nm-ttitel');
+          if (copy && a.tagName === 'A') a.tabIndex = -1;
+          const dt = document.createElement('div'); dt.className = 'nm-tdatum'; dt.textContent = r.datum_label;
+          body.append(a, dt);
+          row.append(window.nmTile(r, 'nm-ttile'), body);
+          box.append(row);
+        });
+        return box;
+      };
+      el.append(lijst(false));
+      if (!st.reduce && el.scrollHeight > el.clientHeight + 20) { el.append(lijst(true)); st.loop = true; }
+      st.pos = Math.min(st.pos, el.scrollHeight / 2); st.prog = true; el.scrollTop = st.pos;
+    },
+    unmount: (el, st) => { if (st && st.cleanup) st.cleanup(); },
+  });
+
+  dash.draw('recent', (el) => {
+    const d = dash.data('wvdm_recent');
+    el.replaceChildren();
+    if (d.status === 'loading') { el.classList.add('dash-skeleton'); return; }
+    el.classList.remove('dash-skeleton');
+    if (d.status !== 'ok') {
+      if (d.status === 'error') {
+        const f = document.createElement('div'); f.className = 'nm-fail';
+        f.append(document.createElement('i'), 'Failed to load');
+        el.append(f);
+      } else { el.textContent = '—'; }
+      return;
+    }
+    const kanalen = window.NM_KANALEN;
+    d.data.forEach((r) => {
+      const kaart = document.createElement('article'); kaart.className = 'nm-kaart';
+      const beeld = document.createElement('div'); beeld.className = 'nm-kaart-beeld';
+      const kleur = window.NM_COLORS[Math.max(0, kanalen.indexOf(r.kanaal))];
+      beeld.style.background = `linear-gradient(135deg, ${kleur}, ${kleur}55)`;
+      const letter = document.createElement('span'); letter.className = 'nm-letter';
+      letter.textContent = String(r.bron || '?').replace(/^www\./, '').charAt(0).toUpperCase();
+      const badge = document.createElement('span'); badge.className = 'nm-badge';
+      badge.textContent = r.kanaal === 'Website' ? 'Website' : r.kanaal;
+      beeld.append(letter, badge);
+      const body = document.createElement('div'); body.className = 'nm-kaart-body';
+      const meta = document.createElement('div'); meta.className = 'nm-kaart-meta';
+      meta.textContent = r.bron + ' · ' + r.datum_label;
+      let titel;
+      if (typeof r.url === 'string' && r.url.startsWith('https://')) {
+        titel = document.createElement('a'); titel.href = r.url; titel.target = '_blank'; titel.rel = 'noopener noreferrer';
+      } else { titel = document.createElement('span'); }
+      titel.className = 'nm-kaart-titel'; titel.textContent = r.titel;
+      const tekst = document.createElement('p'); tekst.className = 'nm-kaart-tekst'; tekst.textContent = r.samenvatting || '';
+      body.append(meta, titel, tekst);
+      kaart.append(beeld, body);
+      el.append(kaart);
+    });
+  });
+</script>
+
+<script>
+  dash.draw('hashtags', (el) => {
+    const d = dash.data('wvdm_hashtags');
+    el.replaceChildren();
+    if (d.status === 'loading') { el.classList.add('dash-skeleton'); return; }
+    el.classList.remove('dash-skeleton');
+    if (d.status !== 'ok') {
+      if (d.status === 'error') {
+        const f = document.createElement('div'); f.className = 'nm-fail';
+        f.append(document.createElement('i'), 'Failed to load');
+        el.append(f);
+      } else { el.textContent = '—'; }
+      return;
+    }
+    const max = Math.max(1, d3.max(d.data, (r) => r.aantal) || 0);
+    d.data.forEach((r) => {
+      const row = document.createElement('div'); row.className = 'nm-tagrow';
+      const naam = document.createElement('span'); naam.className = 'nm-tagname'; naam.textContent = r.tag;
+      const bar = document.createElement('span'); bar.className = 'nm-bar';
+      const fill = document.createElement('i'); fill.style.width = (100 * r.aantal / max) + '%';
+      if (String(r.tag).startsWith('@')) fill.style.background = '#c084fc';
+      bar.append(fill);
+      const n = document.createElement('span'); n.className = 'nm-tagn'; n.textContent = d3.format(',')(r.aantal);
+      row.append(naam, bar, n);
+      el.append(row);
+    });
+  });
+</script>
+
+<script>
+  const NM_MAANDEN = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+  const nmLabel = (iso) => { const d = new Date(iso + 'T00:00:00Z'); return d.getUTCDate() + ' ' + NM_MAANDEN[d.getUTCMonth()]; };
+  const NM_START = '2026-11-06';
+  const NM_EIND = '2026-11-13';
+
+  dash.draw('chart', (el) => {
+    const d = dash.data('wvdm_per_dag');
+    el.replaceChildren();
+    if (d.status !== 'ok') {
+      if (d.status === 'loading') { el.classList.add('dash-skeleton'); return; }
+      el.classList.remove('dash-skeleton');
+      if (d.status === 'error') {
+        const f = document.createElement('div'); f.className = 'nm-fail';
+        f.append(document.createElement('i'), 'Failed to load');
+        el.append(f);
+      } else { el.textContent = '—'; }
+      return;
+    }
+    el.classList.remove('dash-skeleton');
+    const rows = d.data;
+    const kanalen = window.NM_KANALEN;
+    const W = Math.max(280, el.clientWidth || 500), H = 220;
+    const m = { t: 24, r: 6, b: 26, l: 8 };
+    const ymax = Math.max(4, d3.max(rows, (r) => r.totaal) || 0);
+    const y = d3.scaleLinear([0, ymax], [H - m.b, m.t]).nice();
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'Vermeldingen per dag per kanaal');
+
+    const yTicks = y.ticks(3).filter((t) => Number.isInteger(t));
+    const probe = svg.append('text').text(d3.format(',')(d3.max(yTicks)));
+    m.l = Math.ceil(probe.node().getComputedTextLength()) + 10;
+    probe.remove();
+
+    const x = d3.scaleBand(rows.map((r) => r.datum), [m.l, W - m.r]).paddingInner(0.25).paddingOuter(0.1);
+    const bw = x.bandwidth();
+
+    if (x(NM_START) !== undefined && x(NM_EIND) !== undefined) {
+      const x0 = x(NM_START) - x.step() * x.paddingInner() / 2;
+      const x1 = x(NM_EIND) + bw + x.step() * x.paddingInner() / 2;
+      svg.append('rect').attr('x', x0).attr('y', m.t - 20).attr('width', x1 - x0).attr('height', H - m.b - m.t + 20).attr('fill', '#ffffff').attr('opacity', 0.06).attr('rx', 3);
+      svg.append('text').attr('x', x0 + 6).attr('y', m.t - 6).text('Campagneweek');
+    }
+
+    const g = svg.append('g');
+    yTicks.forEach((t) => {
+      g.append('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y(t)).attr('y2', y(t)).attr('stroke', t === 0 ? '#4a5361' : '#2b313c').attr('stroke-width', 1);
+      g.append('text').attr('x', m.l - 6).attr('y', y(t)).attr('dy', '0.32em').attr('text-anchor', 'end').text(d3.format(',')(t));
+    });
+
+    const series = d3.stack().keys(kanalen)(rows);
+    series.forEach((s, i) => {
+      svg.append('g').attr('fill', window.NM_COLORS[i]).selectAll('rect').data(s.filter((p) => p[1] > p[0])).join('rect')
+        .attr('x', (p) => x(p.data.datum)).attr('width', bw)
+        .attr('y', (p) => y(p[1])).attr('height', (p) => Math.max(0, y(p[0]) - y(p[1]) - (p[1] < p.data.totaal ? 1 : 0)))
+        .attr('rx', Math.min(2, bw / 2));
+    });
+
+    const today = new Date().toISOString().slice(0, 10);
+    if (x(today) !== undefined) {
+      const tx = x(today) + bw / 2;
+      svg.append('line').attr('x1', tx).attr('x2', tx).attr('y1', m.t).attr('y2', H - m.b).attr('stroke', '#8a94a3').attr('stroke-dasharray', '3 3');
+      svg.append('text').attr('x', tx + 4).attr('y', m.t + 10).text('vandaag');
+    }
+
+    const per = Math.max(1, Math.ceil(rows.length / Math.max(2, Math.floor((W - m.l - m.r) / 60))));
+    rows.forEach((r, i) => {
+      if (i % per !== 0) return;
+      svg.append('text').attr('x', x(r.datum) + bw / 2).attr('y', H - m.b + 18).attr('text-anchor', 'middle').text(nmLabel(r.datum));
+    });
+
+    const tip = document.createElement('div'); tip.className = 'nm-tip'; tip.hidden = true; el.append(tip);
+    const hl = svg.append('rect').attr('fill', '#ffffff').attr('opacity', 0).attr('rx', 2).attr('pointer-events', 'none');
+    svg.append('g').selectAll('rect').data(rows).join('rect')
+      .attr('x', (r) => x(r.datum) - x.step() * x.paddingInner() / 2).attr('width', x.step())
+      .attr('y', m.t).attr('height', H - m.b - m.t).attr('fill', 'transparent')
+      .on('mouseenter', (ev, r) => {
+        hl.attr('x', x(r.datum) - 2).attr('width', bw + 4).attr('y', m.t).attr('height', H - m.b - m.t).attr('opacity', 0.06);
+        tip.replaceChildren();
+        const dt = document.createElement('div'); dt.className = 'nm-tip-date'; dt.textContent = nmLabel(r.datum) + ' 2026'; tip.append(dt);
+        kanalen.forEach((k, i) => {
+          const row = document.createElement('div'); row.className = 'nm-tip-row';
+          const sw = document.createElement('i'); sw.className = 'nm-swatch'; sw.style.background = window.NM_COLORS[i];
+          row.append(sw, (k === 'Website' ? 'Websites' : k) + ': ' + d3.format(',')(r[k]));
+          tip.append(row);
+        });
+        const tot = document.createElement('div'); tot.className = 'nm-tip-row'; tot.textContent = 'Totaal: ' + d3.format(',')(r.totaal); tip.append(tot);
+        tip.hidden = false;
+        const scale = el.clientWidth / W;
+        let left = (x(r.datum) + bw + 8) * scale;
+        const tw = tip.offsetWidth;
+        if (left + tw > el.clientWidth) left = Math.max(0, x(r.datum) * scale - tw - 8);
+        tip.style.left = left + 'px';
+        tip.style.top = (m.t * scale) + 'px';
+      })
+      .on('mouseleave', () => { tip.hidden = true; hl.attr('opacity', 0); });
+  });
+</script>
+
+<script>
+  dash.draw('tabel', (tb) => {
+    const d = dash.data('vermeldingen');
+    tb.replaceChildren();
+    const leeg = document.querySelectorAll('.nm-empty');
+    if (d.status !== 'ok') { leeg.forEach((p) => { p.hidden = true; }); return; }
+    const f = window.nmFilter || { kanaal: '', q: '' };
+    const rows = d.data
+      .filter((r) => r.onderwerp === 'Week van de Mediawijsheid 2026')
+      .filter((r) => !f.kanaal || r.kanaal === f.kanaal)
+      .filter((r) => !f.thema || (f.thema === 'mm' ? r.mediamasters === true : r.mediamasters !== true))
+      .filter((r) => !f.q || (String(r.bron) + ' ' + String(r.titel) + ' ' + String(r.soort)).toLowerCase().includes(f.q))
+      .slice()
+      .sort((a, b) => (b.datum || '').localeCompare(a.datum || ''));
+    rows.forEach((r) => {
+      const tr = document.createElement('tr'); tr.dataset.key = r.id;
+      const td = (txt, cls) => { const c = document.createElement('td'); if (cls) c.className = cls; c.textContent = txt == null ? '' : String(txt); tr.append(c); return c; };
+      td(r.datum_label);
+      td(r.kanaal);
+      td(r.bron);
+      const c = document.createElement('td');
+      if (typeof r.url === 'string' && r.url.startsWith('https://')) {
+        const a = document.createElement('a'); a.href = r.url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = r.titel; c.append(a);
+      } else { c.textContent = r.titel; }
+      tr.append(c);
+      td(r.soort, 'nm-hide');
+      tb.append(tr);
+    });
+    leeg.forEach((p) => { p.hidden = rows.length > 0; });
+  });
+</script>
+
+</div>
+</body>
+</html>
