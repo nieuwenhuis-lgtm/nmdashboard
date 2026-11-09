@@ -271,9 +271,10 @@
     .nm-recent::-webkit-scrollbar, .nm-ticker::-webkit-scrollbar { display: none; }
   }
   /* v18: link naar analysepagina */
-  .nm-analyselink { margin: 4px 0 0; font-size: 16px; }
-  .nm-analyselink a { color: #ffffff; text-decoration: underline; text-underline-offset: 3px; }
-  .nm-analyselink a:hover { color: #ec1162; }
+  .nm-analyselink { margin: 18px 0 4px; text-align: center; }
+  .nm-analyselink a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 22px; border-radius: 999px; background: #ec1162; color: #ffffff; font-weight: 700; font-size: 17px; text-decoration: none; white-space: nowrap; box-sizing: border-box; }
+  .nm-analyselink a:hover { background: #c90e53; color: #ffffff; }
+  .nm-analyselink a:focus-visible { outline: 2px solid #ffffff; outline-offset: 3px; }
   [data-dash-source-state=empty] { color: transparent; }
   [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
 </style>
