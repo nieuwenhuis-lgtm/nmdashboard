@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drie jaar Week van de Mediawijsheid: online trends analyse – Netwerk Mediawijsheid</title>
+<meta name="description" content="Analyse van online berichten over de Week van de Mediawijsheid 2024, 2025 en 2026: afzenders, onderwerpen, doelgroepen, toon en trends.">
+<link rel="icon" href="../assets/logo.svg">
+<style>html, body { margin: 0; background: #0e1116; }</style>
+</head>
+<body>
+<style>
+  #dash-root { --dash-gutter: 0; }
+  .nm-page {
+    --nm-bg: #0e1116; --nm-panel: #181c23; --nm-panel2: #20252e; --nm-line: #2b313c; --nm-fg: #f3f5f8; --nm-muted: #b3bcc9; --nm-axis: #4a5361;
+    font-family: Arial, Helvetica, sans-serif; color: var(--nm-fg); background: var(--nm-bg);
+    font-size: 18px; line-height: 1.5; display: grid; gap: 24px; padding: 28px clamp(14px, 3vw, 40px) 40px;
+  }
+  .nm-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+  .nm-top h1 { font-family: Arial, Helvetica, sans-serif; font-weight: 700; font-size: clamp(26px, 3.6vw, 36px); line-height: 1.2; margin: 0; }
+  .nm-pick { display: flex; align-items: center; gap: 10px; font-size: 17px; color: var(--nm-muted); }
+  .nm-page .dash-select { background-color: #232833; color: var(--nm-fg); border-color: var(--nm-axis); font-family: Arial, Helvetica, sans-serif; font-size: 18px; min-height: 44px; }
+  .nm-topic { display: grid; gap: 24px; }
+  .nm-intro { background: var(--nm-panel); border: 1px solid var(--nm-line); border-radius: 10px; padding: 22px 24px; }
+  .nm-intro p { margin: 0; }
+  .nm-intro .nm-big { font-size: clamp(26px, 3.4vw, 34px); font-weight: 700; line-height: 1.2; margin-bottom: 10px; }
+  .nm-intro .nm-big .nm-v { font-size: clamp(44px, 6vw, 64px); color: #ffffff; font-variant-numeric: tabular-nums; vertical-align: -0.08em; }
+  .nm-intro .nm-small { font-size: 17px; color: var(--nm-muted); line-height: 1.6; }
+  .nm-intro .nm-small b { color: var(--nm-fg); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .nm-intro .nm-dot { margin: 0 8px; opacity: .6; }
+  .nm-intro .nm-fine { font-size: 14px; color: var(--nm-muted); margin-top: 8px; opacity: .85; }
+  .nm-tags { display: grid; gap: 8px; min-height: 120px; }
+  .nm-tagrow { display: grid; grid-template-columns: minmax(8rem, 12rem) 1fr 2.5rem; align-items: center; gap: 10px; font-size: 16px; }
+  .nm-tagrow .nm-tagname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nm-tagrow .nm-bar { height: 12px; border-radius: 3px; background: var(--nm-panel2); position: relative; overflow: hidden; }
+  .nm-tagrow .nm-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: #5aa9ff; }
+  .nm-tagrow .nm-tagn { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+  .nm-section-title { font-size: 26px; font-weight: 700; margin: 0 0 4px; }
+  .nm-note { font-size: 16px; color: var(--nm-muted); margin: 0 0 16px; }
+  .nm-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: 16px; min-height: 260px; }
+  .nm-kaart { background: var(--nm-panel); border: 1px solid var(--nm-line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+  .nm-kaart-beeld { height: 120px; display: flex; align-items: center; justify-content: center; position: relative; }
+  .nm-kaart-beeld .nm-letter { font-size: 56px; font-weight: 700; color: rgba(255,255,255,.92); line-height: 1; }
+  .nm-kaart-beeld .nm-badge { position: absolute; left: 12px; bottom: 10px; font-size: 14px; font-weight: 700; background: rgba(0,0,0,.45); color: #fff; padding: 2px 8px; border-radius: 999px; }
+  .nm-kaart-body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; }
+  .nm-kaart-meta { font-size: 15px; color: var(--nm-muted); }
+  .nm-kaart-titel { font-size: 19px; font-weight: 700; line-height: 1.3; color: #ffffff; text-decoration: none; }
+  .nm-kaart-titel:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .nm-kaart-tekst { font-size: 16px; color: var(--nm-muted); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 0; }
+  .nm-compact { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: 16px; align-items: start; }
+  .nm-card { background: var(--nm-panel); border: 1px solid var(--nm-line); border-radius: 10px; padding: 18px; min-width: 0; }
+  .nm-card h2 { font-size: 20px; font-weight: 700; margin: 0 0 6px; }
+  .nm-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr)); gap: 10px; }
+  .nm-tile { background: var(--nm-panel2); border-radius: 8px; padding: 12px 14px; }
+  .nm-tile .nm-label { font-size: 16px; color: var(--nm-muted); display: flex; align-items: center; gap: 8px; }
+  .nm-tile .nm-num { font-weight: 700; font-size: 32px; line-height: 1.15; font-variant-numeric: tabular-nums; margin-top: 4px; min-height: 1.15em; color: #ffffff; }
+  .nm-tile .nm-sub { font-size: 14px; color: var(--nm-muted); }
+  .nm-swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; flex: none; }
+  .nm-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 15px; color: var(--nm-fg); margin-bottom: 8px; }
+  .nm-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .nm-chart { position: relative; min-height: 220px; }
+  .nm-chart svg text { font-family: Arial, Helvetica, sans-serif; font-size: 14px; fill: var(--nm-muted); }
+  .nm-tip { position: absolute; pointer-events: none; background: #232833; border: 1px solid var(--nm-axis); border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.45); padding: 10px 12px; font-size: 15px; color: var(--nm-fg); white-space: nowrap; z-index: 2; }
+  .nm-tip .nm-tip-date { color: var(--nm-muted); margin-bottom: 4px; }
+  .nm-tip .nm-tip-row { display: flex; align-items: center; gap: 8px; font-variant-numeric: tabular-nums; }
+  .nm-fail { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 220px; color: var(--nm-muted); font-size: 16px; }
+  .nm-fail i { width: 8px; height: 8px; border-radius: 50%; background: #ff6b6b; display: inline-block; }
+  .nm-lijst > summary, .nm-details > summary { cursor: pointer; font-weight: 700; font-size: 19px; }
+  .nm-controls { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0; }
+  .nm-search { flex: 1 1 14rem; min-width: 0; font-family: Arial, Helvetica, sans-serif; font-size: 17px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--nm-axis); border-radius: 8px; background: #232833; color: var(--nm-fg); box-sizing: border-box; }
+  .nm-search::placeholder { color: var(--nm-muted); }
+  .nm-tablebox { max-height: 34rem; overflow: auto; }
+  .nm-table { width: 100%; border-collapse: collapse; font-size: 16px; }
+  .nm-table th { position: sticky; top: 0; background: var(--nm-panel); text-align: left; font-size: 15px; color: var(--nm-muted); font-weight: 700; padding: 8px 10px; border-bottom: 2px solid var(--nm-line); }
+  .nm-table td { padding: 9px 10px; border-bottom: 1px solid var(--nm-line); vertical-align: top; }
+  .nm-table td:first-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .nm-table a { color: #8cc4ff; text-decoration: underline; text-underline-offset: 3px; }
+  .nm-empty { color: var(--nm-muted); font-size: 16px; margin: 12px 0 0; }
+  @media (max-width: 640px) { .nm-table .nm-hide { display: none; } .nm-intro p { font-size: 19px; } }
+  .nm-details dl { font-size: 16px; margin: 12px 0 0; }
+  .nm-details dt { font-weight: 700; margin-top: 14px; }
+  .nm-details dd { margin: 0; color: var(--nm-muted); }
+  /* v4: logo, achtergrondfoto, Meest recent + lichtkrant */
+  .nm-page { position: relative; isolation: isolate; overflow: hidden; --nm-panel: rgba(24,28,35,.84); --nm-panel2: rgba(36,41,51,.78); --nm-pink: #ec1162; }
+  .nm-bg { position: absolute; left: 0; right: 0; top: 0; height: min(100%, 980px); z-index: -1; background-repeat: no-repeat; background-size: cover; background-position: right top; }
+  .nm-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(14,17,22,.94) 0%, rgba(14,17,22,.82) 40%, rgba(14,17,22,.45) 75%, rgba(14,17,22,.35) 100%), linear-gradient(180deg, rgba(14,17,22,0) 55%, #0e1116 100%); }
+  @media (max-width: 760px) { .nm-bg { height: 520px; background-position: 70% top; } .nm-bg::after { background: linear-gradient(180deg, rgba(14,17,22,.55) 0%, rgba(14,17,22,.8) 55%, #0e1116 100%); } }
+  .nm-card, .nm-intro, .nm-feed { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  .nm-brand { display: flex; align-items: center; gap: 16px; min-width: 0; }
+  .nm-brand .nm-logo { width: 150px; height: 66px; flex: none; margin-left: -10px; background: no-repeat left center / contain; }
+  @media (max-width: 520px) { .nm-brand .nm-logo { width: 116px; height: 52px; } }
+  .nm-brand .nm-divider { width: 1px; align-self: stretch; background: rgba(255,255,255,.25); margin: 10px 0; }
+  .nm-feed { background: var(--nm-panel); border: 1px solid var(--nm-line); border-top: 3px solid var(--nm-pink); border-radius: 12px; padding: 20px; display: grid; gap: 18px; }
+  .nm-feed h2 { color: var(--nm-pink); font-size: 24px; font-weight: 700; margin: 0; }
+  .nm-recent { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 14px; min-height: 230px; }
+  .nm-recent .nm-kaart { background: var(--nm-panel2); }
+  .nm-ticker-wrap { position: relative; border-top: 1px solid var(--nm-line); padding-top: 12px; }
+  .nm-ticker-wrap::before, .nm-ticker-wrap::after { content: ""; position: absolute; left: 0; right: 12px; height: 28px; pointer-events: none; z-index: 1; }
+  .nm-ticker-wrap::before { top: 12px; background: linear-gradient(180deg, rgba(24,28,35,.95), rgba(24,28,35,0)); }
+  .nm-ticker-wrap::after { bottom: 0; background: linear-gradient(0deg, rgba(24,28,35,.95), rgba(24,28,35,0)); }
+  .nm-ticker { height: 340px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #4a5361 transparent; }
+  .nm-trow { display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center; padding: 9px 4px; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .nm-trow .nm-ttile { width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; color: #fff; }
+  .nm-trow a, .nm-trow .nm-ttitel { color: #ffffff; font-size: 17px; font-weight: 700; line-height: 1.3; text-decoration: none; display: block; }
+  .nm-trow a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .nm-trow .nm-tdatum { font-size: 14px; color: var(--nm-muted); margin-top: 2px; }
+  /* v5: compacte intro, lichtere panelen, horizontale lichtkrant */
+  .nm-page { --nm-panel: rgba(24,28,35,.67); --nm-panel2: rgba(36,41,51,.6); }
+  .nm-intro { padding: 12px 18px; }
+  .nm-intro .nm-line { font-size: 17px; font-weight: 400; line-height: 1.6; color: var(--nm-fg); margin: 0; }
+  .nm-intro .nm-line b { font-weight: 700; color: #ffffff; font-variant-numeric: tabular-nums; }
+  .nm-intro .nm-line .nm-fine { font-size: 15px; color: var(--nm-muted); }
+  .nm-recent { display: flex; gap: 14px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; scrollbar-color: #4a5361 transparent; min-height: 290px; padding-bottom: 6px; }
+  .nm-recent .nm-kaart { flex: 0 0 300px; }
+  @media (max-width: 520px) { .nm-recent .nm-kaart { flex-basis: 260px; } }
+  .nm-ticker-wrap::before { background: linear-gradient(180deg, rgba(24,28,35,.7), rgba(24,28,35,0)); }
+  .nm-ticker-wrap::after { background: linear-gradient(0deg, rgba(24,28,35,.7), rgba(24,28,35,0)); }
+  /* v6: campagnelogo, foto overal zichtbaar, geen vervaging, kleinere introtekst */
+  .nm-bg { height: 100%; background-attachment: fixed; background-position: right center; }
+  .nm-bg::after { background: linear-gradient(90deg, rgba(14,17,22,.62) 0%, rgba(14,17,22,.45) 55%, rgba(14,17,22,.3) 100%); }
+  @media (max-width: 760px) { .nm-bg { height: 100%; background-attachment: scroll; background-position: 70% top; } .nm-bg::after { background: rgba(14,17,22,.55); } }
+  .nm-card, .nm-intro, .nm-feed { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .nm-feed { border-top: 1px solid var(--nm-line); }
+  .nm-introrow { display: flex; align-items: center; gap: 20px; }
+  .nm-introrow .nm-intro { flex: 1 1 auto; min-width: 0; }
+  .nm-camplogo { flex: none; width: 104px; height: 74px; background: no-repeat center / contain; }
+  @media (max-width: 640px) { .nm-introrow { flex-direction: column-reverse; align-items: flex-start; gap: 12px; } }
+  .nm-intro .nm-line { font-size: 15px; }
+  .nm-intro .nm-line .nm-fine { font-size: 13px; }
+  .nm-foto { color: transparent !important; }
+  .nm-foto .nm-letter { display: none; }
+  /* v7: kanaalkleuren, placeholders, groter campagnelogo, lichtere laag, twee kolommen, Instagram-pop-up */
+  .nm-bg::after { background: linear-gradient(90deg, rgba(14,17,22,.52) 0%, rgba(14,17,22,.35) 55%, rgba(14,17,22,.2) 100%); }
+  @media (max-width: 760px) { .nm-bg::after { background: rgba(14,17,22,.45); } }
+  .nm-introrow { justify-content: space-between; }
+  .nm-introrow .nm-intro { flex: 0 1 auto; }
+  .nm-intro .nm-line + .nm-line { margin-top: 2px; }
+  .nm-camplogo { width: 208px; height: 148px; }
+  @media (max-width: 640px) { .nm-camplogo { width: 156px; height: 111px; } }
+  .nm-tlist { display: grid; grid-template-columns: 1fr 1fr; column-gap: 28px; }
+  @media (max-width: 760px) { .nm-tlist { grid-template-columns: 1fr; } }
+  .nm-ttile, .nm-kaart-beeld { text-shadow: 0 1px 6px rgba(0,0,0,.45); }
+  .nm-kaart-beeld .nm-badge { color: #ffffff; text-shadow: none; }
+  .nm-klik { cursor: zoom-in; }
+  .nm-klik:focus-visible { outline: 2px solid #ffffff; outline-offset: 2px; }
+  .nm-pop { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,.72); display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .nm-pop-box { background: #ffffff; border-radius: 12px; width: min(100%, 480px); max-height: 90vh; overflow: auto; position: relative; padding: 12px; font-family: Arial, Helvetica, sans-serif; }
+  .nm-pop-x { position: absolute; top: 6px; right: 8px; border: 0; background: #0e1116; color: #ffffff; width: 34px; height: 34px; border-radius: 50%; font-size: 20px; line-height: 1; cursor: pointer; z-index: 2; }
+  .nm-pop-link { display: block; text-align: center; margin: 8px 0 2px; color: #145ecc; font-size: 15px; }
+  /* v9: past op de telefoon, duidelijke schuifbalken, kaderkopjes gelijk, lichter lichtkrantkader, kanaalpictogrammen */
+  .nm-page { grid-template-columns: minmax(0, 1fr); }
+  .nm-topic { grid-template-columns: minmax(0, 1fr); }
+  .nm-top, .nm-topic, .nm-feed, .nm-compact, .nm-introrow, .nm-intro, .nm-pick, .nm-card, .nm-ticker-wrap { min-width: 0; max-width: 100%; }
+  .nm-onderwerp { min-width: 0; max-width: 100%; }
+  .nm-feed { background: rgba(24,28,35,.62); }
+  .nm-ticker-wrap::before { background: linear-gradient(180deg, rgba(24,28,35,.62), rgba(24,28,35,0)); }
+  .nm-ticker-wrap::after { background: linear-gradient(0deg, rgba(24,28,35,.62), rgba(24,28,35,0)); }
+  .nm-feed h2, .nm-card h2, .nm-lijst > summary, .nm-details > summary { color: #ffffff; font-size: 26px; font-weight: 700; line-height: 1.25; margin: 0 0 6px; }
+  .nm-feed h2 { margin: 0; }
+  .nm-recent, .nm-ticker, .nm-tablebox { scrollbar-width: auto; scrollbar-color: #5B6270 rgba(213,217,224,.55); }
+  .nm-recent::-webkit-scrollbar, .nm-ticker::-webkit-scrollbar, .nm-tablebox::-webkit-scrollbar { width: 12px; height: 12px; }
+  .nm-recent::-webkit-scrollbar-track, .nm-ticker::-webkit-scrollbar-track, .nm-tablebox::-webkit-scrollbar-track { background: rgba(213,217,224,.55); border-radius: 999px; }
+  .nm-recent::-webkit-scrollbar-thumb, .nm-ticker::-webkit-scrollbar-thumb, .nm-tablebox::-webkit-scrollbar-thumb { background: #5B6270; border-radius: 999px; border: 2px solid rgba(213,217,224,.55); background-clip: padding-box; }
+  .nm-recent::-webkit-scrollbar-thumb:hover, .nm-ticker::-webkit-scrollbar-thumb:hover, .nm-tablebox::-webkit-scrollbar-thumb:hover { background-color: #474d59; }
+  .nm-recent { padding-bottom: 10px; }
+  .nm-ticker-wrap::before, .nm-ticker-wrap::after { right: 16px; }
+  .nm-trow { padding-left: 6px; }
+  .nm-trow .nm-ttile { position: relative; }
+  .nm-tkanaal { position: absolute; left: -5px; bottom: -5px; width: 20px; height: 20px; border-radius: 5px; background: no-repeat center / 130% 130%; font-size: 0; text-shadow: none; box-shadow: 0 0 0 2px rgba(24,28,35,.85); pointer-events: none; }
+  @media (max-width: 640px) {
+    .nm-page { font-size: 16px; padding-left: 12px; padding-right: 12px; }
+    .nm-top { flex-direction: column; align-items: stretch; gap: 12px; }
+    .nm-pick { flex-wrap: wrap; gap: 6px; }
+    .nm-onderwerp { width: 100%; }
+    .nm-introrow .nm-intro { width: 100%; box-sizing: border-box; }
+    .nm-camplogo { width: 120px; height: 85px; }
+    .nm-feed, .nm-card { padding: 14px; }
+    .nm-feed h2, .nm-card h2, .nm-lijst > summary, .nm-details > summary { font-size: 22px; }
+    .nm-recent .nm-kaart { flex-basis: 80vw; }
+    .nm-kaart-titel { font-size: 17px; overflow-wrap: anywhere; }
+    .nm-trow a, .nm-trow .nm-ttitel { font-size: 16px; overflow-wrap: anywhere; }
+    .nm-tagrow { grid-template-columns: minmax(0, 7.5rem) 1fr 2.2rem; font-size: 15px; }
+    .nm-intro .nm-line { overflow-wrap: anywhere; }
+  }
+  /* v10: klikbare berichten, oplichten, titel, MediaMasters-logo, grotere schuifknop, tabelvolgorde */
+  .nm-logos { flex: none; display: flex; align-items: center; gap: 12px; }
+  .nm-mmlogo { width: 189px; height: 92px; }
+  .nm-ticker::-webkit-scrollbar-thumb, .nm-tablebox::-webkit-scrollbar-thumb { min-height: 60px; }
+  .nm-recent::-webkit-scrollbar-thumb { min-width: 60px; }
+  .nm-kaart, .nm-trow, .nm-table tbody tr { cursor: pointer; }
+  .nm-kaart { transition: background-color .12s ease, box-shadow .12s ease, transform .12s ease; }
+  .nm-recent { padding-top: 4px; }
+  .nm-recent .nm-kaart:hover, .nm-kaart:hover { background: rgba(52,59,72,.92); box-shadow: 0 0 0 1px rgba(255,255,255,.28), 0 8px 22px rgba(0,0,0,.35); transform: translateY(-2px); }
+  .nm-trow { border-radius: 8px; transition: background-color .12s ease; }
+  .nm-trow:hover { background: rgba(255,255,255,.09); }
+  .nm-trow .nm-ttile { transition: transform .12s ease; }
+  .nm-trow:hover .nm-ttile { transform: scale(1.06); }
+  .nm-table tbody td { transition: background-color .12s ease; }
+  .nm-table tbody tr:hover td { background: rgba(255,255,255,.08); }
+  .nm-table td:first-child { white-space: normal; font-variant-numeric: normal; }
+  .nm-table .nm-c-datum { white-space: nowrap; font-variant-numeric: tabular-nums; padding-right: 4px; }
+  .nm-table .nm-c-kanaal { white-space: nowrap; padding-left: 4px; }
+  .nm-table .nm-c-kanaal, .nm-table .nm-hide { width: 1%; white-space: nowrap; }
+  .nm-table .nm-c-datum { width: 1%; min-width: 6.4em; white-space: normal; }
+  @media (min-width: 641px) { .nm-table th:nth-child(2) { width: 24%; } }
+  @media (prefers-reduced-motion: reduce) { .nm-kaart, .nm-trow, .nm-trow .nm-ttile, .nm-table tbody td { transition: none; } .nm-recent .nm-kaart:hover, .nm-kaart:hover, .nm-trow:hover .nm-ttile { transform: none; } }
+  @media (max-width: 760px) { .nm-bg { background-position: 84% top; } }
+  @media (max-width: 640px) { .nm-logos { gap: 10px; } .nm-mmlogo { width: 111px; height: 54px; } }
+  /* v12: Chrome en Edge gebruiken de eigen schuifbalkvormgeving (grote knop); Firefox krijgt alleen de kleuren */
+  .nm-recent, .nm-ticker, .nm-tablebox { scrollbar-width: auto; scrollbar-color: auto; }
+  @supports (-moz-appearance: none) { .nm-recent, .nm-ticker, .nm-tablebox { scrollbar-color: #5B6270 rgba(213,217,224,.55); } }
+  .nm-ticker::-webkit-scrollbar-thumb, .nm-tablebox::-webkit-scrollbar-thumb { min-height: 90px; }
+  .nm-recent::-webkit-scrollbar-thumb { min-width: 90px; }
+  /* v13: rode aantallen, laatst bijgewerkt, downloadknop */
+  .nm-intro .nm-line b.nm-aantal { color: #ec1162; font-size: 18px; font-weight: 700; }
+  .nm-csv { font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 700; min-height: 44px; padding: 8px 16px; border-radius: 8px; border: 1px solid #ec1162; background: #ec1162; color: #ffffff; cursor: pointer; }
+  .nm-csv:hover { background: #c90d52; border-color: #c90d52; }
+  .nm-csv:focus-visible { outline: 2px solid #ffffff; outline-offset: 2px; }
+  .nm-csv-melding { font-size: 14px; color: var(--nm-muted); align-self: center; }
+  @media (min-width: 761px) { .nm-bg { background-size: max(112vw, 199vh) auto; background-position: right 35%; } }
+  @media (max-width: 760px) { .nm-bg { background-position: 74% top; } }
+  /* v14: lichtkranten met de muis vastpakken en slepen */
+  .nm-recent, .nm-ticker { cursor: grab; }
+  .nm-sleept, .nm-sleept * { cursor: grabbing !important; user-select: none; -webkit-user-select: none; }
+  .nm-recent img, .nm-ticker img { -webkit-user-drag: none; }
+  /* v16: telefoon - keuzelijst bovenaan, titel onder het logo, aantallen als lijstje */
+  .nm-kv { display: inline; }
+  @media (max-width: 640px) {
+    .nm-top { display: flex; flex-direction: column; align-items: stretch; gap: 14px; }
+    .nm-top .nm-pick { order: -1; }
+    .nm-brand { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .nm-brand .nm-divider { display: none; }
+    .nm-brand h1 { width: 100%; }
+    .nm-kvs .nm-dot, .nm-kvs .nm-komma { display: none; }
+    .nm-kvs { display: block; }
+    .nm-kvs .nm-kv { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.14); }
+    .nm-kvs .nm-k { min-width: 0; }
+    .nm-kvs .nm-v { flex: none; text-align: right; white-space: nowrap; }
+    .nm-kvs .nm-v b.nm-aantal { font-variant-numeric: tabular-nums; }
+    .nm-intro .nm-line.nm-kvs + .nm-line.nm-kvs { margin-top: 0; }
+  }
+  /* v17: telefoon - lichtkranten laten zien dat ze schuiven */
+  .nm-recent-wrap { position: relative; min-width: 0; }
+  .nm-pijl, .nm-voortgang { display: none; }
+  @media (max-width: 640px) {
+    .nm-recent .nm-kaart { flex-basis: 74vw; }
+    .nm-recent { -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 26px), transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 26px), transparent 100%); }
+    .nm-pijl { display: flex; align-items: center; justify-content: center; position: absolute; top: 70px; width: 14px; height: 44px; padding: 0; border: 0; background: none; color: rgba(255,255,255,.85); font: 700 22px/1 Arial, Helvetica, sans-serif; cursor: pointer; z-index: 2; }
+    .nm-pijl-l { left: -14px; }
+    .nm-pijl-r { right: -14px; }
+    .nm-pijl[hidden] { display: none; }
+    .nm-voortgang { display: block; position: relative; background: rgba(0,0,0,.55); border-radius: 999px; overflow: hidden; }
+    .nm-voortgang i { position: absolute; display: block; background: #ffffff; border-radius: 999px; }
+    .nm-voortgang-x { height: 5px; margin: 10px 0 0; }
+    .nm-voortgang-x i { top: 0; bottom: 0; left: 0; width: 20%; }
+    .nm-ticker-wrap { padding-right: 14px; }
+    .nm-voortgang-y { position: absolute; top: 12px; bottom: 0; right: 0; width: 5px; }
+    .nm-voortgang-y i { left: 0; right: 0; top: 0; height: 20%; }
+    .nm-recent, .nm-ticker { scrollbar-width: none; }
+    .nm-recent::-webkit-scrollbar, .nm-ticker::-webkit-scrollbar { display: none; }
+  }
+  [data-dash-source-state=empty] { color: transparent; }
+  [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+</style>
+<style>
+  /* analysepagina */
+  .an-terug { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 18px; border-radius: 999px; background: #ec1162; color: #ffffff; font-weight: 700; font-size: 17px; text-decoration: none; white-space: nowrap; box-sizing: border-box; }
+  .an-terug:hover { background: #c90e53; }
+  .an-terug:focus-visible { outline: 2px solid #ffffff; outline-offset: 3px; }
+  .an-intro p { margin: 0 0 10px; font-size: 17px; line-height: 1.55; }
+  .an-intro p:last-child { margin-bottom: 0; }
+  .an-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .an-nav a { color: #ffffff; text-decoration: none; border: 1px solid #4a5361; border-radius: 999px; padding: 6px 14px; font-size: 15px; background: rgba(36,41,51,.6); }
+  .an-nav a:hover { border-color: #ec1162; }
+  .nm-card h3 { font-size: 19px; margin: 18px 0 8px; color: #ffffff; }
+  .an-tiles { margin: 10px 0 4px; }
+  .an-numtxt { font-size: 22px !important; line-height: 1.25 !important; hyphens: manual; overflow-wrap: anywhere; }
+  .an-pies { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr)); gap: 8px 28px; }
+  .an-donut { margin: 0; display: grid; grid-template-columns: 170px minmax(0,1fr); gap: 18px; align-items: center; }
+  .an-donut svg { width: 170px; height: 170px; }
+  .an-donut path { transition: opacity .15s; outline: none; }
+  .an-donut svg:hover path { opacity: .55; }
+  .an-donut svg path:hover, .an-donut svg path:focus { opacity: 1; }
+  .an-dn { fill: #ffffff; font: 700 30px Arial, Helvetica, sans-serif; }
+  .an-dl { fill: #b3bcc9; font: 13px Arial, Helvetica, sans-serif; }
+  .an-legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 15px; }
+  .an-legend li { display: grid; grid-template-columns: 12px minmax(0,1fr) 2.2rem 2.6rem; gap: 8px; align-items: center; }
+  .an-ln, .an-lp { text-align: right; font-variant-numeric: tabular-nums; }
+  .an-lp { color: #b3bcc9; }
+  .an-fine { font-size: 14px; color: #b3bcc9; margin: 8px 0 0; }
+  .an-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 0 28px; }
+  .an-list { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 16px; line-height: 1.5; }
+  .an-list b { color: #ffffff; }
+  .an-trends { border-top: 1px solid rgba(255,255,255,.12); margin-top: 18px; }
+  .an-drie { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 8px 28px; }
+  .an-dg h3 { margin-top: 6px; }
+  .an-dg .nm-tagrow { grid-template-columns: minmax(0, 11rem) 1fr 2.6rem; font-size: 15px; margin-bottom: 4px; }
+  .an-dg .nm-bar i { background: #3987e5; }
+  .an-acties li { margin-bottom: 4px; }
+  .an-voet { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; font-size: 14px; color: #b3bcc9; }
+  @media (max-width: 640px) {
+    .an-donut { grid-template-columns: 1fr; justify-items: start; }
+    .an-donut svg { width: 150px; height: 150px; }
+    .an-legend { width: 100%; }
+    .nm-top .an-terug { align-self: flex-start; }
+    .an-dg .nm-tagrow { grid-template-columns: minmax(0, 9rem) 1fr 2.4rem; }
+  }
+</style>
+<div class="nm-page">
+  <div class="nm-bg" style="background-image:url('../assets/bg-wvdm2026.jpg?v=3')"></div>
+  <header class="nm-top">
+    <div class="nm-brand">
+      <a href="../" aria-label="Naar het dashboard"><span class="nm-logo" role="img" aria-label="Netwerk Mediawijsheid" style="background-image:url('../assets/logo.svg');display:block"></span></a>
+      <span class="nm-divider"></span>
+      <h1 class="nm-titel">Drie jaar Week van de Mediawijsheid: online trends analyse</h1>
+    </div>
+    <a class="an-terug" href="../">← Terug naar dashboard</a>
+  </header>
+
+  <section class="nm-card an-intro">
+    <h2>In het kort</h2>
+    <p>Sinds 2024 staat de Week van de Mediawijsheid in het teken van <b>digitale balans</b>. Voor deze analyse zijn openbare berichten van andere organisaties en mensen verzameld uit 2024, 2025 en 2026 (websites, Instagram, LinkedIn en Facebook). Eigen kanalen van Netwerk Mediawijsheid, Iedereen Mediawijs en MediaMasters zijn weggelaten.</p>
+    <ul class="an-list"><li><b>Het hoofdthema landt.</b> In alle drie jaren gaat ongeveer een derde van de onderwerpen over schermtijd en digitale balans. Partners gebruiken de campagnetaal steeds vaker letterlijk.</li><li><b>Van schermtijd naar opvoeding en keuzes.</b> In 2024 ging het vooral om “hoeveel uur?”. Vanaf 2025 gaat het veel meer over mediaopvoeding en bewuste keuzes; ouders zijn nu de grootste doelgroep in de berichten.</li><li><b>Steeds meer soorten afzenders.</b> In 2024 waren scholen dominant; in 2026 delen scholen, bibliotheken, kennisinstellingen, bedrijven, GGD’s, lokale media en individuele professionals de ruimte.</li><li><b>Nieuwe invalshoeken:</b> AI, smartphoneregels, de online manosfeer en sextortion. Die groeien als subthema naast het hoofdthema.</li><li><b>Blinde vlekken blijven:</b> peuters en kinderopvang, senioren, mensen met een LVB, doven en slechthorenden en jongvolwassenen komen in alle jaren weinig voor.</li></ul>
+    <p class="an-fine">De aantallen per jaar zijn niet onderling te vergelijken: oudere berichten zijn op social media veel moeilijker terug te vinden. Vergelijk daarom vooral de verhoudingen (percentages). Zie “Kwaliteit van de telling”.</p>
+    <nav class="an-nav" aria-label="Inhoud"><a href="#jaar-2024">2024</a><a href="#jaar-2025">2025</a><a href="#jaar-2026">2026</a><a href="#doelgroepen">Doelgroepen</a><a href="#toon">Toon</a><a href="#kwaliteit">Kwaliteit van de telling</a><a href="#acties">Acties</a></nav>
+  </section>
+
+  <section class="nm-card an-jaar" id="jaar-2024">
+    <h2>2024 · Jaar 1: “Gezond schermgebruik”</h2>
+    <p class="nm-note">Campagneweek 8 t/m 15 november 2024. Start van het driejarige thema digitale balans; MediaMasters ging voor het eerst ook naar groep 5/6.</p>
+    <div class="nm-tiles an-tiles">
+      <div class="nm-tile"><div class="nm-label">Berichten geanalyseerd</div><div class="nm-num">43</div><div class="nm-sub">Instagram 33 · Website 10</div></div>
+      <div class="nm-tile"><div class="nm-label">Grootste afzender</div><div class="nm-num an-numtxt">Scholen</div><div class="nm-sub">37% van de berichten</div></div>
+      <div class="nm-tile"><div class="nm-label">Hoofdthema</div><div class="nm-num an-numtxt">Schermtijd &amp; balans</div><div class="nm-sub">37% van alle thema-vermeldingen</div></div>
+    </div>
+    <div class="an-pies">
+      <div><h3>Wie berichtten er? (afzenders)</h3><figure class="an-donut"><svg viewBox="0 0 200 200" role="img" aria-label="Afzenders 2024"><path d="M100.00 8.00 A92 92 0 0 1 166.23 163.85 L140.31 138.87 A56 56 0 0 0 100.00 44.00 Z" fill="#3987e5" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Scholen &amp; schoolbesturen: 16 (37%)</title></path><path d="M166.23 163.85 A92 92 0 0 1 145.03 180.23 L127.41 148.83 A56 56 0 0 0 140.31 138.87 Z" fill="#d95926" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Bibliotheken: 2 (5%)</title></path><path d="M145.03 180.23 A92 92 0 0 1 80.00 189.80 L87.82 154.66 A56 56 0 0 0 127.41 148.83 Z" fill="#199e70" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Kennis- &amp; zorginstellingen: 5 (12%)</title></path><path d="M80.00 189.80 A92 92 0 0 1 33.77 163.85 L59.69 138.87 A56 56 0 0 0 87.82 154.66 Z" fill="#c98500" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Educatieve bedrijven &amp; uitgevers: 4 (9%)</title></path><path d="M33.77 163.85 A92 92 0 0 1 10.99 76.73 L45.82 85.84 A56 56 0 0 0 59.69 138.87 Z" fill="#d55181" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Jongeren- &amp; welzijnswerk: 7 (16%)</title></path><path d="M10.99 76.73 A92 92 0 0 1 15.33 64.02 L48.46 78.10 A56 56 0 0 0 45.82 85.84 Z" fill="#9085e9" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Individuele professionals &amp; particulieren: 1 (2%)</title></path><path d="M15.33 64.02 A92 92 0 0 1 21.47 52.07 L52.20 70.83 A56 56 0 0 0 48.46 78.10 Z" fill="#e66767" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Media &amp; nieuws: 1 (2%)</title></path><path d="M21.47 52.07 A92 92 0 0 1 100.00 8.00 L100.00 44.00 A56 56 0 0 0 52.20 70.83 Z" fill="#6b7380" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Overige afzenders: 7 (16%)</title></path><text x="100" y="96" text-anchor="middle" class="an-dn">43</text><text x="100" y="118" text-anchor="middle" class="an-dl">berichten</text></svg><ul class="an-legend"><li><span class="nm-swatch" style="background:#3987e5"></span><span class="an-lnaam">Scholen &amp; schoolbesturen</span><span class="an-ln">16</span><span class="an-lp">37%</span></li><li><span class="nm-swatch" style="background:#d95926"></span><span class="an-lnaam">Bibliotheken</span><span class="an-ln">2</span><span class="an-lp">5%</span></li><li><span class="nm-swatch" style="background:#199e70"></span><span class="an-lnaam">Kennis- &amp; zorginstellingen</span><span class="an-ln">5</span><span class="an-lp">12%</span></li><li><span class="nm-swatch" style="background:#c98500"></span><span class="an-lnaam">Educatieve bedrijven &amp; uitgevers</span><span class="an-ln">4</span><span class="an-lp">9%</span></li><li><span class="nm-swatch" style="background:#d55181"></span><span class="an-lnaam">Jongeren- &amp; welzijnswerk</span><span class="an-ln">7</span><span class="an-lp">16%</span></li><li><span class="nm-swatch" style="background:#9085e9"></span><span class="an-lnaam">Individuele professionals &amp; particulieren</span><span class="an-ln">1</span><span class="an-lp">2%</span></li><li><span class="nm-swatch" style="background:#e66767"></span><span class="an-lnaam">Media &amp; nieuws</span><span class="an-ln">1</span><span class="an-lp">2%</span></li><li><span class="nm-swatch" style="background:#6b7380"></span><span class="an-lnaam">Overige afzenders</span><span class="an-ln">7</span><span class="an-lp">16%</span></li></ul></figure><p class="an-fine">Overige afzenders: mediacoaches, overheid en politie, kinderopvang, cultuur en sport, bedrijven, MediaMasters-makers.</p></div>
+      <div><h3>Waar ging het over? (onderwerpen)</h3><figure class="an-donut"><svg viewBox="0 0 200 200" role="img" aria-label="Onderwerpen 2024"><path d="M100.00 8.00 A92 92 0 0 1 167.69 162.31 L141.20 137.93 A56 56 0 0 0 100.00 44.00 Z" fill="#3987e5" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Schermtijd &amp; digitale balans: 28 (37%)</title></path><path d="M167.69 162.31 A92 92 0 0 1 107.60 191.69 L104.62 155.81 A56 56 0 0 0 141.20 137.93 Z" fill="#d95926" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Mediaopvoeding &amp; ouders: 9 (12%)</title></path><path d="M107.60 191.69 A92 92 0 0 1 56.21 180.91 L73.35 149.25 A56 56 0 0 0 104.62 155.81 Z" fill="#199e70" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Sociale media: 7 (9%)</title></path><path d="M56.21 180.91 A92 92 0 0 1 10.82 122.58 L45.71 113.75 A56 56 0 0 0 73.35 149.25 Z" fill="#c98500" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>MediaMasters &amp; wedstrijd: 10 (13%)</title></path><path d="M10.82 122.58 A92 92 0 0 1 8.00 100.00 L44.00 100.00 A56 56 0 0 0 45.71 113.75 Z" fill="#d55181" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Online veiligheid &amp; privacy: 3 (4%)</title></path><path d="M8.00 100.00 A92 92 0 0 1 15.75 63.04 L48.72 77.51 A56 56 0 0 0 44.00 100.00 Z" fill="#008300" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Nepnieuws &amp; kritisch denken: 5 (7%)</title></path><path d="M15.75 63.04 A92 92 0 0 1 32.31 37.69 L58.80 62.07 A56 56 0 0 0 48.72 77.51 Z" fill="#9085e9" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>AI &amp; algoritmes: 4 (5%)</title></path><path d="M32.31 37.69 A92 92 0 0 1 56.21 19.09 L73.35 50.75 A56 56 0 0 0 58.80 62.07 Z" fill="#e66767" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Gezondheid: slaap, ogen, bewegen: 4 (5%)</title></path><path d="M56.21 19.09 A92 92 0 0 1 100.00 8.00 L100.00 44.00 A56 56 0 0 0 73.35 50.75 Z" fill="#6b7380" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Overige thema&#x27;s: 6 (8%)</title></path><text x="100" y="96" text-anchor="middle" class="an-dn">76</text><text x="100" y="118" text-anchor="middle" class="an-dl">thema-vermeldingen</text></svg><ul class="an-legend"><li><span class="nm-swatch" style="background:#3987e5"></span><span class="an-lnaam">Schermtijd &amp; digitale balans</span><span class="an-ln">28</span><span class="an-lp">37%</span></li><li><span class="nm-swatch" style="background:#d95926"></span><span class="an-lnaam">Mediaopvoeding &amp; ouders</span><span class="an-ln">9</span><span class="an-lp">12%</span></li><li><span class="nm-swatch" style="background:#199e70"></span><span class="an-lnaam">Sociale media</span><span class="an-ln">7</span><span class="an-lp">9%</span></li><li><span class="nm-swatch" style="background:#c98500"></span><span class="an-lnaam">MediaMasters &amp; wedstrijd</span><span class="an-ln">10</span><span class="an-lp">13%</span></li><li><span class="nm-swatch" style="background:#d55181"></span><span class="an-lnaam">Online veiligheid &amp; privacy</span><span class="an-ln">3</span><span class="an-lp">4%</span></li><li><span class="nm-swatch" style="background:#008300"></span><span class="an-lnaam">Nepnieuws &amp; kritisch denken</span><span class="an-ln">5</span><span class="an-lp">7%</span></li><li><span class="nm-swatch" style="background:#9085e9"></span><span class="an-lnaam">AI &amp; algoritmes</span><span class="an-ln">4</span><span class="an-lp">5%</span></li><li><span class="nm-swatch" style="background:#e66767"></span><span class="an-lnaam">Gezondheid: slaap, ogen, bewegen</span><span class="an-ln">4</span><span class="an-lp">5%</span></li><li><span class="nm-swatch" style="background:#6b7380"></span><span class="an-lnaam">Overige thema&#x27;s</span><span class="an-ln">6</span><span class="an-lp">8%</span></li></ul></figure><p class="an-fine">Eén bericht kan meerdere onderwerpen hebben. Overige thema's: gaming, pesten, toegankelijkheid, smartphoneregels.</p></div>
+    </div>
+    <div class="an-cols">
+      <div><h3>Wat valt op</h3><ul class="an-list"><li>Scholen zijn veruit de grootste afzender: vooral basisscholen die laten zien dat hun klas MediaMasters speelt (“hoeveel bits hebben jullie?”).</li><li>Het gesprek gaat vooral over <b>hoeveel</b> tijd je achter een scherm zit: bewustwording, “is jouw schermtijd meer of minder dan 3 uur?”.</li><li>Jongerenwerk (o.a. in Eindhoven) zet influencers en mediacoaches in om jongeren zelf aan het woord te laten.</li><li>Bibliotheken en MediaSmarties organiseren samen een landelijk webinar voor (groot)ouders; dat formaat keert de jaren erna terug.</li></ul></div>
+      <div><h3>Wat komt weinig aan bod</h3><ul class="an-list"><li>Jonge kinderen (0–4) en kinderopvang: slechts één bericht (Zo Kinderopvang lanceerde een mediabeleid).</li><li>Senioren en volwassenen zelf: bijna niets, terwijl het eigen onderzoek over volwassenen ging.</li><li>Mensen met een LVB: één bericht (Hogeschool Leiden).</li><li>GGD/JGZ: niet zichtbaar in de gevonden berichten.</li></ul></div>
+    </div>
+    <div class="an-trends"><h3>Trends 2024</h3><ul class="an-list"><li>Schermtijd als meetbaar getal (“hoeveel uur?”) staat centraal.</li><li>MediaMasters is de motor van de zichtbaarheid op scholen.</li><li>Ouders worden vooral bereikt via de school (ouderavonden) en de bibliotheek (webinar).</li><li>AI en nepnieuws komen al voor, maar als bijthema binnen MediaMasters.</li></ul></div>
+  </section>
+
+  <section class="nm-card an-jaar" id="jaar-2025">
+    <h2>2025 · Jaar 2: “Sta stil, kies, maak van schermtijd weer jóuw tijd”</h2>
+    <p class="nm-note">Campagneweek 7 t/m 14 november 2025. Zelfde thema, nu met de nadruk op het maken van bewuste keuzes.</p>
+    <div class="nm-tiles an-tiles">
+      <div class="nm-tile"><div class="nm-label">Berichten geanalyseerd</div><div class="nm-num">116</div><div class="nm-sub">Instagram 64 · LinkedIn 38 · Website 14</div></div>
+      <div class="nm-tile"><div class="nm-label">Grootste afzender</div><div class="nm-num an-numtxt">Kennis&shy;instellingen</div><div class="nm-sub">16% van de berichten</div></div>
+      <div class="nm-tile"><div class="nm-label">Hoofdthema</div><div class="nm-num an-numtxt">Schermtijd &amp; balans</div><div class="nm-sub">30% van alle thema-vermeldingen</div></div>
+    </div>
+    <div class="an-pies">
+      <div><h3>Wie berichtten er? (afzenders)</h3><figure class="an-donut"><svg viewBox="0 0 200 200" role="img" aria-label="Afzenders 2025"><path d="M100.00 8.00 A92 92 0 0 1 159.56 29.88 L136.25 57.32 A56 56 0 0 0 100.00 44.00 Z" fill="#3987e5" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Scholen &amp; schoolbesturen: 13 (11%)</title></path><path d="M159.56 29.88 A92 92 0 0 1 181.28 56.91 L149.48 73.77 A56 56 0 0 0 136.25 57.32 Z" fill="#d95926" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Bibliotheken: 7 (6%)</title></path><path d="M181.28 56.91 A92 92 0 0 1 178.83 147.43 L147.98 128.87 A56 56 0 0 0 149.48 73.77 Z" fill="#199e70" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Kennis- &amp; zorginstellingen: 19 (16%)</title></path><path d="M178.83 147.43 A92 92 0 0 1 109.95 191.46 L106.05 155.67 A56 56 0 0 0 147.98 128.87 Z" fill="#c98500" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Educatieve bedrijven &amp; uitgevers: 17 (15%)</title></path><path d="M109.95 191.46 A92 92 0 0 1 33.21 163.27 L59.34 138.51 A56 56 0 0 0 106.05 155.67 Z" fill="#d55181" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Jongeren- &amp; welzijnswerk: 17 (15%)</title></path><path d="M33.21 163.27 A92 92 0 0 1 18.72 143.09 L50.52 126.23 A56 56 0 0 0 59.34 138.51 Z" fill="#008300" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>GGD / JGZ / CJG: 5 (4%)</title></path><path d="M18.72 143.09 A92 92 0 0 1 10.15 80.22 L45.31 87.96 A56 56 0 0 0 50.52 126.23 Z" fill="#9085e9" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Individuele professionals &amp; particulieren: 13 (11%)</title></path><path d="M10.15 80.22 A92 92 0 0 1 16.50 61.37 L49.18 76.49 A56 56 0 0 0 45.31 87.96 Z" fill="#e66767" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Media &amp; nieuws: 4 (3%)</title></path><path d="M16.50 61.37 A92 92 0 0 1 100.00 8.00 L100.00 44.00 A56 56 0 0 0 49.18 76.49 Z" fill="#6b7380" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Overige afzenders: 21 (18%)</title></path><text x="100" y="96" text-anchor="middle" class="an-dn">116</text><text x="100" y="118" text-anchor="middle" class="an-dl">berichten</text></svg><ul class="an-legend"><li><span class="nm-swatch" style="background:#3987e5"></span><span class="an-lnaam">Scholen &amp; schoolbesturen</span><span class="an-ln">13</span><span class="an-lp">11%</span></li><li><span class="nm-swatch" style="background:#d95926"></span><span class="an-lnaam">Bibliotheken</span><span class="an-ln">7</span><span class="an-lp">6%</span></li><li><span class="nm-swatch" style="background:#199e70"></span><span class="an-lnaam">Kennis- &amp; zorginstellingen</span><span class="an-ln">19</span><span class="an-lp">16%</span></li><li><span class="nm-swatch" style="background:#c98500"></span><span class="an-lnaam">Educatieve bedrijven &amp; uitgevers</span><span class="an-ln">17</span><span class="an-lp">15%</span></li><li><span class="nm-swatch" style="background:#d55181"></span><span class="an-lnaam">Jongeren- &amp; welzijnswerk</span><span class="an-ln">17</span><span class="an-lp">15%</span></li><li><span class="nm-swatch" style="background:#008300"></span><span class="an-lnaam">GGD / JGZ / CJG</span><span class="an-ln">5</span><span class="an-lp">4%</span></li><li><span class="nm-swatch" style="background:#9085e9"></span><span class="an-lnaam">Individuele professionals &amp; particulieren</span><span class="an-ln">13</span><span class="an-lp">11%</span></li><li><span class="nm-swatch" style="background:#e66767"></span><span class="an-lnaam">Media &amp; nieuws</span><span class="an-ln">4</span><span class="an-lp">3%</span></li><li><span class="nm-swatch" style="background:#6b7380"></span><span class="an-lnaam">Overige afzenders</span><span class="an-ln">21</span><span class="an-lp">18%</span></li></ul></figure><p class="an-fine">Overige afzenders: mediacoaches, overheid en politie, kinderopvang, cultuur en sport, bedrijven, MediaMasters-makers.</p></div>
+      <div><h3>Waar ging het over? (onderwerpen)</h3><figure class="an-donut"><svg viewBox="0 0 200 200" role="img" aria-label="Onderwerpen 2025"><path d="M100.00 8.00 A92 92 0 0 1 187.14 129.52 L153.04 117.97 A56 56 0 0 0 100.00 44.00 Z" fill="#3987e5" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Schermtijd &amp; digitale balans: 61 (30%)</title></path><path d="M187.14 129.52 A92 92 0 0 1 88.58 191.29 L93.05 155.57 A56 56 0 0 0 153.04 117.97 Z" fill="#d95926" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Mediaopvoeding &amp; ouders: 44 (22%)</title></path><path d="M88.58 191.29 A92 92 0 0 1 33.45 163.52 L59.49 138.66 A56 56 0 0 0 93.05 155.57 Z" fill="#199e70" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Sociale media: 22 (11%)</title></path><path d="M33.45 163.52 A92 92 0 0 1 19.85 145.17 L51.21 127.50 A56 56 0 0 0 59.49 138.66 Z" fill="#c98500" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>MediaMasters &amp; wedstrijd: 8 (4%)</title></path><path d="M19.85 145.17 A92 92 0 0 1 8.10 104.29 L44.06 102.61 A56 56 0 0 0 51.21 127.50 Z" fill="#d55181" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Online veiligheid &amp; privacy: 15 (7%)</title></path><path d="M8.10 104.29 A92 92 0 0 1 14.87 65.12 L48.18 78.77 A56 56 0 0 0 44.06 102.61 Z" fill="#008300" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Nepnieuws &amp; kritisch denken: 14 (7%)</title></path><path d="M14.87 65.12 A92 92 0 0 1 31.50 38.58 L58.31 62.62 A56 56 0 0 0 48.18 78.77 Z" fill="#9085e9" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>AI &amp; algoritmes: 11 (5%)</title></path><path d="M31.50 38.58 A92 92 0 0 1 51.14 22.05 L70.26 52.55 A56 56 0 0 0 58.31 62.62 Z" fill="#e66767" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Gezondheid: slaap, ogen, bewegen: 9 (4%)</title></path><path d="M51.14 22.05 A92 92 0 0 1 100.00 8.00 L100.00 44.00 A56 56 0 0 0 70.26 52.55 Z" fill="#6b7380" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Overige thema&#x27;s: 18 (9%)</title></path><text x="100" y="96" text-anchor="middle" class="an-dn">202</text><text x="100" y="118" text-anchor="middle" class="an-dl">thema-vermeldingen</text></svg><ul class="an-legend"><li><span class="nm-swatch" style="background:#3987e5"></span><span class="an-lnaam">Schermtijd &amp; digitale balans</span><span class="an-ln">61</span><span class="an-lp">30%</span></li><li><span class="nm-swatch" style="background:#d95926"></span><span class="an-lnaam">Mediaopvoeding &amp; ouders</span><span class="an-ln">44</span><span class="an-lp">22%</span></li><li><span class="nm-swatch" style="background:#199e70"></span><span class="an-lnaam">Sociale media</span><span class="an-ln">22</span><span class="an-lp">11%</span></li><li><span class="nm-swatch" style="background:#c98500"></span><span class="an-lnaam">MediaMasters &amp; wedstrijd</span><span class="an-ln">8</span><span class="an-lp">4%</span></li><li><span class="nm-swatch" style="background:#d55181"></span><span class="an-lnaam">Online veiligheid &amp; privacy</span><span class="an-ln">15</span><span class="an-lp">7%</span></li><li><span class="nm-swatch" style="background:#008300"></span><span class="an-lnaam">Nepnieuws &amp; kritisch denken</span><span class="an-ln">14</span><span class="an-lp">7%</span></li><li><span class="nm-swatch" style="background:#9085e9"></span><span class="an-lnaam">AI &amp; algoritmes</span><span class="an-ln">11</span><span class="an-lp">5%</span></li><li><span class="nm-swatch" style="background:#e66767"></span><span class="an-lnaam">Gezondheid: slaap, ogen, bewegen</span><span class="an-ln">9</span><span class="an-lp">4%</span></li><li><span class="nm-swatch" style="background:#6b7380"></span><span class="an-lnaam">Overige thema&#x27;s</span><span class="an-ln">18</span><span class="an-lp">9%</span></li></ul></figure><p class="an-fine">Eén bericht kan meerdere onderwerpen hebben. Overige thema's: gaming, pesten, toegankelijkheid, smartphoneregels.</p></div>
+    </div>
+    <div class="an-cols">
+      <div><h3>Wat valt op</h3><ul class="an-list"><li>De afzenders worden <b>breder</b>: kennisinstellingen (NJI, Trimbos, hogescholen, GGZ), educatieve bedrijven (Squla, Basicly, Tumult, NICAM) en jeugdzorg doen nadrukkelijk mee.</li><li><b>Mediaopvoeding</b> wordt het tweede thema: tips voor ouders van mediacoaches, GGD’s en welzijnswerk (“Kijk even écht”, MEDIA-ezelsbrug).</li><li>Op LinkedIn verschuift het gesprek naar professionals: handreikingen, onderzoek, richtlijnen (Richtlijn Gezond Schermgebruik, smartphones in het mbo).</li><li>Smartphoneregels op school en de rol van AI duiken op als nieuwe invalshoeken.</li></ul></div>
+      <div><h3>Wat komt weinig aan bod</h3><ul class="an-list"><li>Peuters en onderbouw blijven onderbelicht (samen ± 7% van de berichten).</li><li>Doven/slechthorenden en LVB: alleen één congres (“Schermen & Grenzen”) en de gebarentaalversie van MediaMasters.</li><li>Gaming als positieve vrijetijdsbesteding: nauwelijks.</li><li>Regionale media: enkele artikelen (o.a. Urk, De Limburger), verder weinig pers.</li></ul></div>
+    </div>
+    <div class="an-trends"><h3>Trends 2025</h3><ul class="an-list"><li>Van “hoeveel schermtijd” naar “welke keuzes maak je” en “hoe voed je op”.</li><li>Ouders worden de grootste doelgroep in de berichten.</li><li>Professionals (jeugdzorg, onderwijs, mbo) vragen om onderbouwing: onderzoek en richtlijnen krijgen veel aandacht.</li><li>Lokale samenwerking groeit: gemeenten, wijkagenten, CJG en bibliotheek organiseren samen avonden en markten.</li><li>Positieve toon neemt toe: veel berichten zijn uitnodigend en enthousiast in plaats van waarschuwend.</li></ul></div>
+  </section>
+
+  <section class="nm-card an-jaar" id="jaar-2026">
+    <h2>2026 · Jaar 3: “Gezond met je scherm” (lopende campagne)</h2>
+    <p class="nm-note">Campagneweek 6 t/m 13 november 2026. Stand van 9 november, midden in de campagneweek; de cijfers groeien nog.</p>
+    <div class="nm-tiles an-tiles">
+      <div class="nm-tile"><div class="nm-label">Berichten geanalyseerd</div><div class="nm-num">313</div><div class="nm-sub">Instagram 156 · LinkedIn 69 · Website 50 · Facebook 38</div></div>
+      <div class="nm-tile"><div class="nm-label">Grootste afzender</div><div class="nm-num an-numtxt">Scholen</div><div class="nm-sub">17% van de berichten</div></div>
+      <div class="nm-tile"><div class="nm-label">Hoofdthema</div><div class="nm-num an-numtxt">Schermtijd &amp; balans</div><div class="nm-sub">32% van alle thema-vermeldingen</div></div>
+    </div>
+    <div class="an-pies">
+      <div><h3>Wie berichtten er? (afzenders)</h3><figure class="an-donut"><svg viewBox="0 0 200 200" role="img" aria-label="Afzenders 2026"><path d="M100.00 8.00 A92 92 0 0 1 181.31 56.96 L149.49 73.80 A56 56 0 0 0 100.00 44.00 Z" fill="#3987e5" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Scholen &amp; schoolbesturen: 54 (17%)</title></path><path d="M181.31 56.96 A92 92 0 0 1 182.57 140.57 L150.26 124.69 A56 56 0 0 0 149.49 73.80 Z" fill="#d95926" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Bibliotheken: 47 (15%)</title></path><path d="M182.57 140.57 A92 92 0 0 1 145.06 180.21 L127.43 148.82 A56 56 0 0 0 150.26 124.69 Z" fill="#199e70" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Kennis- &amp; zorginstellingen: 30 (10%)</title></path><path d="M145.06 180.21 A92 92 0 0 1 86.20 190.96 L91.60 155.37 A56 56 0 0 0 127.43 148.82 Z" fill="#c98500" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Educatieve bedrijven &amp; uitgevers: 33 (11%)</title></path><path d="M86.20 190.96 A92 92 0 0 1 51.75 178.33 L70.63 147.68 A56 56 0 0 0 91.60 155.37 Z" fill="#d55181" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Jongeren- &amp; welzijnswerk: 20 (6%)</title></path><path d="M51.75 178.33 A92 92 0 0 1 30.69 160.50 L57.81 136.83 A56 56 0 0 0 70.63 147.68 Z" fill="#008300" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>GGD / JGZ / CJG: 15 (5%)</title></path><path d="M30.69 160.50 A92 92 0 0 1 8.14 105.08 L44.09 103.09 A56 56 0 0 0 57.81 136.83 Z" fill="#9085e9" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Individuele professionals &amp; particulieren: 33 (11%)</title></path><path d="M8.14 105.08 A92 92 0 0 1 20.48 53.73 L51.60 71.84 A56 56 0 0 0 44.09 103.09 Z" fill="#e66767" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Media &amp; nieuws: 29 (9%)</title></path><path d="M20.48 53.73 A92 92 0 0 1 100.00 8.00 L100.00 44.00 A56 56 0 0 0 51.60 71.84 Z" fill="#6b7380" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Overige afzenders: 52 (17%)</title></path><text x="100" y="96" text-anchor="middle" class="an-dn">313</text><text x="100" y="118" text-anchor="middle" class="an-dl">berichten</text></svg><ul class="an-legend"><li><span class="nm-swatch" style="background:#3987e5"></span><span class="an-lnaam">Scholen &amp; schoolbesturen</span><span class="an-ln">54</span><span class="an-lp">17%</span></li><li><span class="nm-swatch" style="background:#d95926"></span><span class="an-lnaam">Bibliotheken</span><span class="an-ln">47</span><span class="an-lp">15%</span></li><li><span class="nm-swatch" style="background:#199e70"></span><span class="an-lnaam">Kennis- &amp; zorginstellingen</span><span class="an-ln">30</span><span class="an-lp">10%</span></li><li><span class="nm-swatch" style="background:#c98500"></span><span class="an-lnaam">Educatieve bedrijven &amp; uitgevers</span><span class="an-ln">33</span><span class="an-lp">11%</span></li><li><span class="nm-swatch" style="background:#d55181"></span><span class="an-lnaam">Jongeren- &amp; welzijnswerk</span><span class="an-ln">20</span><span class="an-lp">6%</span></li><li><span class="nm-swatch" style="background:#008300"></span><span class="an-lnaam">GGD / JGZ / CJG</span><span class="an-ln">15</span><span class="an-lp">5%</span></li><li><span class="nm-swatch" style="background:#9085e9"></span><span class="an-lnaam">Individuele professionals &amp; particulieren</span><span class="an-ln">33</span><span class="an-lp">11%</span></li><li><span class="nm-swatch" style="background:#e66767"></span><span class="an-lnaam">Media &amp; nieuws</span><span class="an-ln">29</span><span class="an-lp">9%</span></li><li><span class="nm-swatch" style="background:#6b7380"></span><span class="an-lnaam">Overige afzenders</span><span class="an-ln">52</span><span class="an-lp">17%</span></li></ul></figure><p class="an-fine">Overige afzenders: mediacoaches, overheid en politie, kinderopvang, cultuur en sport, bedrijven, MediaMasters-makers.</p></div>
+      <div><h3>Waar ging het over? (onderwerpen)</h3><figure class="an-donut"><svg viewBox="0 0 200 200" role="img" aria-label="Onderwerpen 2026"><path d="M100.00 8.00 A92 92 0 0 1 184.31 136.81 L151.32 122.41 A56 56 0 0 0 100.00 44.00 Z" fill="#3987e5" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Schermtijd &amp; digitale balans: 183 (32%)</title></path><path d="M184.31 136.81 A92 92 0 0 1 99.00 191.99 L99.39 156.00 A56 56 0 0 0 151.32 122.41 Z" fill="#d95926" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Mediaopvoeding &amp; ouders: 108 (19%)</title></path><path d="M99.00 191.99 A92 92 0 0 1 45.92 174.43 L67.08 145.30 A56 56 0 0 0 99.39 156.00 Z" fill="#199e70" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Sociale media: 57 (10%)</title></path><path d="M45.92 174.43 A92 92 0 0 1 13.47 131.26 L47.33 119.03 A56 56 0 0 0 67.08 145.30 Z" fill="#c98500" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>MediaMasters &amp; wedstrijd: 55 (9%)</title></path><path d="M13.47 131.26 A92 92 0 0 1 8.78 88.07 L44.47 92.74 A56 56 0 0 0 47.33 119.03 Z" fill="#d55181" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Online veiligheid &amp; privacy: 44 (8%)</title></path><path d="M8.78 88.07 A92 92 0 0 1 20.16 54.29 L51.40 72.18 A56 56 0 0 0 44.47 92.74 Z" fill="#008300" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Nepnieuws &amp; kritisch denken: 36 (6%)</title></path><path d="M20.16 54.29 A92 92 0 0 1 41.20 29.24 L64.21 56.93 A56 56 0 0 0 51.40 72.18 Z" fill="#9085e9" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>AI &amp; algoritmes: 33 (6%)</title></path><path d="M41.20 29.24 A92 92 0 0 1 57.79 18.25 L74.31 50.24 A56 56 0 0 0 64.21 56.93 Z" fill="#e66767" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Gezondheid: slaap, ogen, bewegen: 20 (3%)</title></path><path d="M57.79 18.25 A92 92 0 0 1 100.00 8.00 L100.00 44.00 A56 56 0 0 0 74.31 50.24 Z" fill="#6b7380" stroke="#1a1d23" stroke-width="2" tabindex="0"><title>Overige thema&#x27;s: 44 (8%)</title></path><text x="100" y="96" text-anchor="middle" class="an-dn">580</text><text x="100" y="118" text-anchor="middle" class="an-dl">thema-vermeldingen</text></svg><ul class="an-legend"><li><span class="nm-swatch" style="background:#3987e5"></span><span class="an-lnaam">Schermtijd &amp; digitale balans</span><span class="an-ln">183</span><span class="an-lp">32%</span></li><li><span class="nm-swatch" style="background:#d95926"></span><span class="an-lnaam">Mediaopvoeding &amp; ouders</span><span class="an-ln">108</span><span class="an-lp">19%</span></li><li><span class="nm-swatch" style="background:#199e70"></span><span class="an-lnaam">Sociale media</span><span class="an-ln">57</span><span class="an-lp">10%</span></li><li><span class="nm-swatch" style="background:#c98500"></span><span class="an-lnaam">MediaMasters &amp; wedstrijd</span><span class="an-ln">55</span><span class="an-lp">9%</span></li><li><span class="nm-swatch" style="background:#d55181"></span><span class="an-lnaam">Online veiligheid &amp; privacy</span><span class="an-ln">44</span><span class="an-lp">8%</span></li><li><span class="nm-swatch" style="background:#008300"></span><span class="an-lnaam">Nepnieuws &amp; kritisch denken</span><span class="an-ln">36</span><span class="an-lp">6%</span></li><li><span class="nm-swatch" style="background:#9085e9"></span><span class="an-lnaam">AI &amp; algoritmes</span><span class="an-ln">33</span><span class="an-lp">6%</span></li><li><span class="nm-swatch" style="background:#e66767"></span><span class="an-lnaam">Gezondheid: slaap, ogen, bewegen</span><span class="an-ln">20</span><span class="an-lp">3%</span></li><li><span class="nm-swatch" style="background:#6b7380"></span><span class="an-lnaam">Overige thema&#x27;s</span><span class="an-ln">44</span><span class="an-lp">8%</span></li></ul></figure><p class="an-fine">Eén bericht kan meerdere onderwerpen hebben. Overige thema's: gaming, pesten, toegankelijkheid, smartphoneregels.</p></div>
+    </div>
+    <div class="an-cols">
+      <div><h3>Wat valt op</h3><ul class="an-list"><li><b>Bibliotheken</b> zijn dit jaar bijna net zo zichtbaar als scholen, met escaperooms, spreekuren, workshops en tips.</li><li><b>Lokale en regionale media</b> pakken het thema op (huis-aan-huisbladen, DvhN, NPO Radio 1/EenVandaag).</li><li>MediaMasters blijft de vrolijke motor: veel schoolberichten, plus aandacht voor toegankelijkheid (gebarentaal via Berengroep).</li><li>Nieuwe zorgen in het gesprek: de online “manosfeer”, sextortion en grensoverschrijdend gedrag (o.a. politie, Kenniscentrum Omgaan met Pesten).</li><li>AI is gegroeid van bijzaak naar een zelfstandig onderwerp (AI-leerdoelen, AI in de klas).</li></ul></div>
+      <div><h3>Wat komt weinig aan bod</h3><ul class="an-list"><li>Peuters, onderbouw en kinderopvang: nog steeds klein (± 5% van de berichten).</li><li>Senioren (3%) en mensen met een LVB (bijna afwezig).</li><li>Jongvolwassenen/mbo-studenten: na 2025 opnieuw weinig zichtbaar.</li><li>Concrete gezondheidseffecten (slaap, ogen, bewegen) worden wel genoemd, maar zelden uitgewerkt.</li></ul></div>
+    </div>
+    <div class="an-trends"><h3>Trends 2026</h3><ul class="an-list"><li>Het thema is “volwassen”: veel partners gebruiken dezelfde taal (“gezond schermgebruik”, “digitale balans”).</li><li>Breedste spreiding van afzenders in drie jaar: van huis-aan-huisblad tot vakantiepark.</li><li>Sterkere koppeling met veiligheid en weerbaarheid (oplichting, sextortion, manosfeer).</li><li>AI en algoritmes groeien als subthema.</li><li>Commerciële partijen haken aan op de week (abonnementen, vakantieparken, boeken); dat vergroot het bereik maar verdunt de boodschap.</li></ul></div>
+  </section>
+
+  <section class="nm-card" id="doelgroepen">
+    <h2>Doelgroepen: over wie gaan de berichten?</h2>
+    <p class="nm-note">Aandeel berichten waarin een doelgroep herkenbaar genoemd wordt. Een bericht kan meerdere doelgroepen hebben. Voor 2026 is gerekend met de volledige Instagram-teksten, omdat die het meeste zeggen over de doelgroep.</p>
+    <div class="an-drie"><div class="an-dg"><h3>2024</h3><p class="an-fine">43 berichten</p><div class="nm-tagrow "><span class="nm-tagname" title="Peuters (0–4)">Peuters (0–4)</span><span class="nm-bar"><i style="width:7.1%"></i></span><span class="nm-tagn">2%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Onderbouw PO (4–8)">Onderbouw PO (4–8)</span><span class="nm-bar"><i style="width:0.0%"></i></span><span class="nm-tagn">0%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Bovenbouw PO (8–12)">Bovenbouw PO (8–12)</span><span class="nm-bar"><i style="width:100.0%"></i></span><span class="nm-tagn">33%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Jongeren 12–18">Jongeren 12–18</span><span class="nm-bar"><i style="width:57.1%"></i></span><span class="nm-tagn">19%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Jongvolwassenen">Jongvolwassenen</span><span class="nm-bar"><i style="width:14.3%"></i></span><span class="nm-tagn">5%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Ouders (± 30–50)">Ouders (± 30–50)</span><span class="nm-bar"><i style="width:50.0%"></i></span><span class="nm-tagn">16%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Senioren">Senioren</span><span class="nm-bar"><i style="width:0.0%"></i></span><span class="nm-tagn">0%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Professionals">Professionals</span><span class="nm-bar"><i style="width:42.9%"></i></span><span class="nm-tagn">14%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Mensen met een LVB">Mensen met een LVB</span><span class="nm-bar"><i style="width:7.1%"></i></span><span class="nm-tagn">2%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Doven & slechthorenden">Doven & slechthorenden</span><span class="nm-bar"><i style="width:0.0%"></i></span><span class="nm-tagn">0%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Niet te bepalen">Niet te bepalen</span><span class="nm-bar"><i style="width:85.7%"></i></span><span class="nm-tagn">28%</span></div></div><div class="an-dg"><h3>2025</h3><p class="an-fine">116 berichten</p><div class="nm-tagrow "><span class="nm-tagname" title="Peuters (0–4)">Peuters (0–4)</span><span class="nm-bar"><i style="width:15.0%"></i></span><span class="nm-tagn">5%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Onderbouw PO (4–8)">Onderbouw PO (4–8)</span><span class="nm-bar"><i style="width:5.0%"></i></span><span class="nm-tagn">2%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Bovenbouw PO (8–12)">Bovenbouw PO (8–12)</span><span class="nm-bar"><i style="width:47.5%"></i></span><span class="nm-tagn">16%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Jongeren 12–18">Jongeren 12–18</span><span class="nm-bar"><i style="width:60.0%"></i></span><span class="nm-tagn">21%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Jongvolwassenen">Jongvolwassenen</span><span class="nm-bar"><i style="width:12.5%"></i></span><span class="nm-tagn">4%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Ouders (± 30–50)">Ouders (± 30–50)</span><span class="nm-bar"><i style="width:100.0%"></i></span><span class="nm-tagn">34%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Senioren">Senioren</span><span class="nm-bar"><i style="width:22.5%"></i></span><span class="nm-tagn">8%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Professionals">Professionals</span><span class="nm-bar"><i style="width:62.5%"></i></span><span class="nm-tagn">22%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Mensen met een LVB">Mensen met een LVB</span><span class="nm-bar"><i style="width:2.5%"></i></span><span class="nm-tagn">1%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Doven & slechthorenden">Doven & slechthorenden</span><span class="nm-bar"><i style="width:0.0%"></i></span><span class="nm-tagn">0%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Niet te bepalen">Niet te bepalen</span><span class="nm-bar"><i style="width:87.5%"></i></span><span class="nm-tagn">30%</span></div></div><div class="an-dg"><h3>2026</h3><p class="an-fine">201 berichten (Instagram)</p><div class="nm-tagrow "><span class="nm-tagname" title="Peuters (0–4)">Peuters (0–4)</span><span class="nm-bar"><i style="width:7.5%"></i></span><span class="nm-tagn">2%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Onderbouw PO (4–8)">Onderbouw PO (4–8)</span><span class="nm-bar"><i style="width:9.0%"></i></span><span class="nm-tagn">3%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Bovenbouw PO (8–12)">Bovenbouw PO (8–12)</span><span class="nm-bar"><i style="width:82.1%"></i></span><span class="nm-tagn">27%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Jongeren 12–18">Jongeren 12–18</span><span class="nm-bar"><i style="width:53.7%"></i></span><span class="nm-tagn">18%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Jongvolwassenen">Jongvolwassenen</span><span class="nm-bar"><i style="width:0.0%"></i></span><span class="nm-tagn">0%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Ouders (± 30–50)">Ouders (± 30–50)</span><span class="nm-bar"><i style="width:94.0%"></i></span><span class="nm-tagn">31%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Senioren">Senioren</span><span class="nm-bar"><i style="width:9.0%"></i></span><span class="nm-tagn">3%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Professionals">Professionals</span><span class="nm-bar"><i style="width:25.4%"></i></span><span class="nm-tagn">8%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Mensen met een LVB">Mensen met een LVB</span><span class="nm-bar"><i style="width:1.5%"></i></span><span class="nm-tagn">0%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Doven & slechthorenden">Doven & slechthorenden</span><span class="nm-bar"><i style="width:6.0%"></i></span><span class="nm-tagn">2%</span></div><div class="nm-tagrow "><span class="nm-tagname" title="Niet te bepalen">Niet te bepalen</span><span class="nm-bar"><i style="width:100.0%"></i></span><span class="nm-tagn">33%</span></div></div></div>
+    <h3>Wat dit laat zien</h3>
+    <ul class="an-list"><li><b>Bovenbouw basisonderwijs (8–12)</b> is in alle jaren goed vertegenwoordigd, vooral dankzij MediaMasters.</li><li><b>Ouders</b> groeiden van ± 16% (2024) naar ruim 30% van de berichten (2025 en 2026).</li><li><b>Jongeren 12–18</b> zijn stabiel (± 20%), vaak via middelbare scholen, wijkagenten en jongerenwerk.</li><li><b>Peuters, onderbouw, senioren, jongvolwassenen</b> blijven klein (elk 0–8%).</li><li><b>Mensen met een LVB</b> en <b>doven/slechthorenden</b> zijn nauwelijks zichtbaar; waar ze voorkomen gaat het om specialisten (Hogeschool Leiden, congres “Schermen & Grenzen”, Berengroep).</li><li>Bij ongeveer een derde van de berichten is <b>niet te bepalen</b> voor wie ze bedoeld zijn (“iedereen”).</li></ul>
+  </section>
+
+  <section class="nm-card" id="toon">
+    <h2>Toon en sentiment</h2>
+    <p class="nm-note">Herkend aan woorden in de Instagram-teksten. Een bericht kan zowel enthousiast als bezorgd zijn. Dit is een grove indicatie.</p>
+    <div class="an-drie"><div class="an-dg"><h3>2024</h3><p class="an-fine">33 Instagram-berichten</p><div class="nm-tagrow"><span class="nm-tagname">Positief / enthousiast</span><span class="nm-bar"><i style="width:24.2%;background:#199e70"></i></span><span class="nm-tagn">24%</span></div><div class="nm-tagrow"><span class="nm-tagname">Neutraal</span><span class="nm-bar"><i style="width:48.5%;background:#6b7380"></i></span><span class="nm-tagn">48%</span></div><div class="nm-tagrow"><span class="nm-tagname">Bezorgd / probleemgericht</span><span class="nm-bar"><i style="width:36.4%;background:#d95926"></i></span><span class="nm-tagn">36%</span></div></div><div class="an-dg"><h3>2025</h3><p class="an-fine">64 Instagram-berichten</p><div class="nm-tagrow"><span class="nm-tagname">Positief / enthousiast</span><span class="nm-bar"><i style="width:48.4%;background:#199e70"></i></span><span class="nm-tagn">48%</span></div><div class="nm-tagrow"><span class="nm-tagname">Neutraal</span><span class="nm-bar"><i style="width:42.2%;background:#6b7380"></i></span><span class="nm-tagn">42%</span></div><div class="nm-tagrow"><span class="nm-tagname">Bezorgd / probleemgericht</span><span class="nm-bar"><i style="width:25.0%;background:#d95926"></i></span><span class="nm-tagn">25%</span></div></div><div class="an-dg"><h3>2026</h3><p class="an-fine">201 Instagram-berichten</p><div class="nm-tagrow"><span class="nm-tagname">Positief / enthousiast</span><span class="nm-bar"><i style="width:42.3%;background:#199e70"></i></span><span class="nm-tagn">42%</span></div><div class="nm-tagrow"><span class="nm-tagname">Neutraal</span><span class="nm-bar"><i style="width:38.3%;background:#6b7380"></i></span><span class="nm-tagn">38%</span></div><div class="nm-tagrow"><span class="nm-tagname">Bezorgd / probleemgericht</span><span class="nm-bar"><i style="width:30.8%;background:#d95926"></i></span><span class="nm-tagn">31%</span></div></div></div>
+    <h3>Voorzichtig geïnterpreteerd</h3>
+    <ul class="an-list"><li>In 2024 was de toon vaker <b>waarschuwend</b> (“te veel schermtijd”). Vanaf 2025 overheerst een <b>uitnodigende, positieve</b> toon: tips, vieren dat de klas meedoet, samen in gesprek.</li><li>In 2026 neemt de <b>bezorgdheid</b> weer iets toe, vooral rond de manosfeer, sextortion en grensoverschrijdend gedrag.</li><li>Let op: een positieve toon zegt iets over de sfeer van de berichten, <b>niet</b> over het effect van de campagne. Of mensen hun schermgebruik veranderen, blijkt hier niet uit.</li></ul>
+  </section>
+
+  <section class="nm-card" id="kwaliteit">
+    <h2>Kwaliteit van de telling</h2>
+    <ul class="an-list"><li><b>Aantallen:</b> 2024 = 43 berichten, 2025 = 116, 2026 = 313 (stand 9 november). Het verschil komt grotendeels door de zoekmethode: Instagram en LinkedIn tonen vooral recente berichten, en voor 2026 wordt dagelijks gezocht. Groei in aantallen is dus <b>geen</b> bewijs van meer aandacht.</li><li><b>LinkedIn 2024</b> kon nauwelijks worden teruggevonden en <b>Facebook 2024/2025</b> niet; die jaren steunen vooral op Instagram en websites.</li><li><b>Dubbele berichten:</b> berichten met (vrijwel) dezelfde tekst zijn één keer geteld. Weggelaten: 2025 = 4, 2026 = 9.</li><li><b>Weggelaten:</b> eigen kanalen (mediawijsheid.nl, netwerkmediawijsheid.nl, weekvandemediawijsheid.nl, mediamasters.nl, @iedereenmediawijs, @mediamastersnl), buitenlandse “Media Masters”-accounts, een voetbalclub en een mondhygiëneweek die ook #wvdm gebruiken, en berichten die de campagne alleen terloops noemen.</li><li><b>Indeling:</b> afzenders, onderwerpen, doelgroepen en toon zijn automatisch ingedeeld op basis van trefwoorden en daarna steekproefsgewijs gecontroleerd. Reken op een foutmarge van ruwweg <b>10 procentpunten</b> per categorie; kleine categorieën (onder 5%) zijn indicatief.</li><li><b>2026 gebruikt twee bronnen:</b> voor Instagram de volledige posttekst, voor de andere kanalen de titel en een korte samenvatting. Onderwerpen kunnen daardoor bij websites, Facebook en LinkedIn iets ondergeteld zijn.</li><li><b>Niet gemeten:</b> bereik, weergaven en effect. Likes zijn alleen bekend voor Instagram en zeggen weinig over impact.</li></ul>
+  </section>
+
+  <section class="nm-card" id="acties">
+    <h2>Concrete acties</h2>
+    <ol class="an-list an-acties">
+      <li><b>Maak een kant-en-klaar pakket voor de kinderopvang en de onderbouw</b> (0–8 jaar): drie korte posts, een oudertip en een beeld. Deze groep is in drie jaar nauwelijks zichtbaar geworden.</li>
+      <li><b>Benut de bibliotheken als regionale aanjager.</b> Zij groeiden het sterkst in 2026; bied hen vooraf een format voor een ouder- of seniorenactiviteit, met een vaste hashtag.</li>
+      <li><b>Zet senioren en jongvolwassenen expliciet in de toolkit</b>, bijvoorbeeld samen met SeniorWeb, mbo-scholen en hogescholen.</li>
+      <li><b>Werk inclusie uit:</b> materialen in eenvoudige taal en voor mensen met een LVB, en laat de gebarentaalversie van MediaMasters breder zien.</li>
+      <li><b>Geef lokale media een persbericht met een regionale haak</b> (lokale cijfers, een school of bibliotheek uit de buurt). Huis-aan-huisbladen pakten het in 2026 al vaker op.</li>
+      <li><b>Verbind het hoofdthema met de nieuwe zorgen</b> (AI, manosfeer, sextortion), zodat partners niet los van de campagne gaan communiceren.</li>
+      <li><b>Kies één hoofdhashtag en communiceer die vroeg.</b> Partners gebruiken nu door elkaar #wvdm, #weekvandemediawijsheid, #gezondmetjescherm en varianten als #WvdM24 en #Weekvdmediawijsheid. Bovendien gebruiken een voetbalclub en de Week van de Mondhygiënist ook #wvdm. Een unieke tag maakt terugvinden en tellen betrouwbaarder.</li>
+      <li><b>Meet volgend jaar vanaf 1 oktober dagelijks</b> en leg ook Facebook en LinkedIn vast; dan zijn de jaren eerlijk te vergelijken.</li>
+    </ol>
+  </section>
+
+  <section class="nm-card nm-details">
+    <h2>Methode en beperkingen</h2>
+    <ul class="an-list"><li><b>Bronnen:</b> websites (via zoekmachines), Instagram (zoeken op o.a. #weekvandemediawijsheid, #wvdm, #gezondmetjescherm en jaartal), LinkedIn (zoeken op campagnenaam, jaartal en #wvdm2025) en voor 2026 ook Facebook en de verzameling van de monitor.</li><li><b>Selectie:</b> alleen berichten die inhoudelijk over de campagne of MediaMasters gaan, gepubliceerd in het campagnenajaar (september t/m december).</li><li><b>Analyse:</b> trefwoordenlijsten per afzendertype, onderwerp, doelgroep, toon en type activiteit, gevolgd door handmatige controle en duiding. De teksten op deze pagina zijn samenvattingen in eigen woorden.</li><li><b>Uitgevoerd door:</b> Claude (AI) in opdracht van Netwerk Mediawijsheid, 9 november 2026. Een tweede meting volgt na afloop van de campagne.</li></ul>
+  </section>
+
+  <footer class="an-voet">
+    <span>Analyse gemaakt op 9 november 2026 · cijfers 2026 zijn een tussenstand.</span>
+    <a class="an-terug" href="../">← Terug naar dashboard</a>
+  </footer>
+</div>
+</body>
+</html>

@@ -270,6 +270,10 @@
     .nm-recent, .nm-ticker { scrollbar-width: none; }
     .nm-recent::-webkit-scrollbar, .nm-ticker::-webkit-scrollbar { display: none; }
   }
+  /* v18: link naar analysepagina */
+  .nm-analyselink { margin: 4px 0 0; font-size: 16px; }
+  .nm-analyselink a { color: #ffffff; text-decoration: underline; text-underline-offset: 3px; }
+  .nm-analyselink a:hover { color: #ec1162; }
   [data-dash-source-state=empty] { color: transparent; }
   [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
 </style>
@@ -423,6 +427,7 @@
         <dd>De eigen campagnepagina's op netwerkmediawijsheid.nl, mediawijsheid.nl en weekvandemediawijsheid.nl, en X, TikTok en YouTube.</dd>
       </dl>
     </details>
+    <p class="nm-analyselink"><a href="analyse/">Analyse van berichten</a></p>
   </div>
 </div>
 
