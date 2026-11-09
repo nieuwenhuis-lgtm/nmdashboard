@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Beheer vermeldingen – Netwerk Mediawijsheid</title>
+<link rel="icon" href="../assets/logo.svg">
+<style>
+  :root {
+    --bg: #0e1116; --panel: #181c23; --panel2: #20252e; --line: #2b313c; --fg: #f3f5f8; --muted: #b3bcc9; --axis: #4a5361;
+    --accent: #5aa9ff; --ok: #34d399; --warn: #fbbf24; --bad: #f87171;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: Arial, Helvetica, sans-serif; font-size: 17px; line-height: 1.5; }
+  a { color: var(--accent); }
+  main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 60px; display: grid; gap: 20px; }
+  header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+  header .merk { display: flex; align-items: center; gap: 12px; }
+  header img { height: 36px; }
+  h1 { font-size: clamp(22px, 3vw, 30px); margin: 0; line-height: 1.2; }
+  h2 { font-size: 21px; margin: 0 0 12px; }
+  .kaart { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+  .smal { max-width: 460px; margin: 40px auto 0; width: 100%; }
+  .stil { color: var(--muted); font-size: 15px; }
+  label { display: grid; gap: 4px; font-size: 15px; color: var(--muted); }
+  input, select, textarea, button { font: inherit; }
+  input[type=text], input[type=url], input[type=password], input[type=date], input[type=search], select, textarea {
+    width: 100%; background: #232833; color: var(--fg); border: 1px solid var(--axis); border-radius: 6px; padding: 9px 10px; min-height: 42px;
+  }
+  textarea { min-height: 72px; resize: vertical; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  button { cursor: pointer; border-radius: 6px; border: 1px solid var(--axis); background: var(--panel2); color: var(--fg); padding: 8px 14px; min-height: 40px; }
+  button:hover { border-color: var(--muted); }
+  button.hoofd { background: #2563eb; border-color: #2563eb; color: #fff; font-weight: 700; }
+  button.hoofd:hover { background: #1d4ed8; }
+  button:disabled { opacity: .5; cursor: default; }
+  button.klein { padding: 4px 10px; min-height: 32px; font-size: 14px; }
+  .rij { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .raster { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px; }
+  .raster .breed { grid-column: 1 / -1; }
+  .vinkje { display: flex; align-items: center; gap: 8px; color: var(--fg); font-size: 16px; }
+  .vinkje input { width: 20px; height: 20px; }
+  .melding { padding: 10px 14px; border-radius: 6px; font-size: 15px; }
+  .melding.fout { background: rgba(248,113,113,.12); border: 1px solid var(--bad); }
+  .melding.goed { background: rgba(52,211,153,.12); border: 1px solid var(--ok); }
+  .melding.info { background: rgba(90,169,255,.10); border: 1px solid var(--accent); }
+  .balk { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .tabelvak { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; padding: 8px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 400; white-space: nowrap; }
+  td.titel { min-width: 260px; }
+  td.titel a { color: var(--fg); text-decoration: none; font-weight: 700; }
+  td.titel a:hover { text-decoration: underline; }
+  td.titel .sam { color: var(--muted); font-size: 14px; margin-top: 2px; }
+  td.nw { white-space: nowrap; }
+  tr.verborgen td { opacity: .45; }
+  tr.verborgen td.actie { opacity: 1; }
+  tr.gewijzigd td:first-child { box-shadow: inset 3px 0 0 var(--warn); }
+  .label { display: inline-block; font-size: 12px; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--axis); color: var(--muted); margin: 2px 4px 0 0; white-space: nowrap; }
+  .label.mm { border-color: #c084fc; color: #e9d5ff; }
+  .label.hand { border-color: var(--ok); color: #bbf7d0; }
+  .label.verb { border-color: var(--bad); color: #fecaca; }
+  .label.nieuw { border-color: var(--warn); color: #fde68a; }
+  .teller { font-variant-numeric: tabular-nums; }
+  [hidden] { display: none !important; }
+  @media (max-width: 640px) {
+    th.optioneel, td.optioneel { display: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="merk"><img src="../assets/logo.svg" alt=""><h1>Beheer vermeldingen</h1></div>
+    <div class="rij" id="kopknoppen" hidden>
+      <a href="../" target="_blank" rel="noopener">Dashboard openen</a>
+      <button type="button" id="knop-vergrendel">Vergrendelen</button>
+    </div>
+  </header>
+
+  <!-- Eerste keer op dit apparaat -->
+  <section class="kaart smal" id="scherm-instellen" hidden>
+    <h2>Eerste keer op dit apparaat</h2>
+    <p class="stil">Plak je GitHub-sleutel (fine-grained personal access token met schrijfrechten op <code>nmdashboard</code>) en kies een wachtwoord. De sleutel wordt versleuteld met dat wachtwoord en alleen in deze browser bewaard.</p>
+    <form id="form-instellen" class="raster" autocomplete="off">
+      <label class="breed">GitHub-sleutel<input type="password" id="in-token" required placeholder="github_pat_…" autocomplete="off"></label>
+      <label>Wachtwoord<input type="password" id="in-ww1" required minlength="6" autocomplete="new-password"></label>
+      <label>Wachtwoord herhalen<input type="password" id="in-ww2" required minlength="6" autocomplete="new-password"></label>
+      <div class="breed rij"><button class="hoofd" type="submit">Opslaan en openen</button></div>
+      <div class="breed melding fout" id="fout-instellen" hidden></div>
+    </form>
+  </section>
+
+  <!-- Vergrendeld -->
+  <section class="kaart smal" id="scherm-slot" hidden>
+    <h2>Wachtwoord</h2>
+    <form id="form-slot" class="raster">
+      <label class="breed">Wachtwoord<input type="password" id="in-ww" required autocomplete="current-password" autofocus></label>
+      <div class="breed rij"><button class="hoofd" type="submit">Openen</button></div>
+      <div class="breed melding fout" id="fout-slot" hidden></div>
+    </form>
+    <p class="stil" style="margin-top:16px">Wachtwoord vergeten of nieuwe sleutel? <button type="button" class="klein" id="knop-wis">Sleutel van dit apparaat wissen</button> en stel opnieuw in.</p>
+  </section>
+
+  <!-- Beheer -->
+  <div id="scherm-beheer" hidden style="display:grid;gap:20px">
+    <div class="balk">
+      <div class="rij" style="justify-content:space-between">
+        <div class="stil" id="status">Laden…</div>
+        <div class="rij">
+          <button type="button" id="knop-ongedaan" disabled>Wijzigingen weggooien</button>
+          <button type="button" class="hoofd" id="knop-opslaan" disabled>Opslaan</button>
+        </div>
+      </div>
+      <div class="melding" id="melding" hidden style="margin-top:10px"></div>
+    </div>
+
+    <section class="kaart">
+      <h2>Vermelding toevoegen</h2>
+      <form id="form-nieuw" class="raster" autocomplete="off">
+        <label class="breed">Link (volledige https-adres) *<input type="url" id="n-url" required placeholder="https://…"></label>
+        <label class="breed">Titel *<input type="text" id="n-titel" required></label>
+        <label>Kanaal<select id="n-kanaal"><option>Website</option><option>Instagram</option><option>Facebook</option><option>LinkedIn</option></select></label>
+        <label>Soort<select id="n-soort"><option>Nieuws</option><option>Social post</option><option>Aankondiging</option><option>Agenda / informatiepagina</option><option>Doorplaatsing</option></select></label>
+        <label>Bron (domein of account)<input type="text" id="n-bron" placeholder="bij websites: wordt ingevuld uit de link"></label>
+        <label>Datum van het bericht<input type="date" id="n-datum"></label>
+        <label class="breed">Korte samenvatting (één à twee zinnen, eigen woorden)<textarea id="n-sam"></textarea></label>
+        <label>Hashtags/tags (gescheiden door spaties)<input type="text" id="n-tags" placeholder="#wvdm2026 #mediamasters"></label>
+        <label>Afbeelding (https-link, alleen bij websites)<input type="url" id="n-beeld" placeholder="optioneel"></label>
+        <label class="vinkje breed"><input type="checkbox" id="n-mm"> Gaat echt over de game MediaMasters</label>
+        <div class="breed rij"><button class="hoofd" type="submit">Toevoegen aan de lijst</button><span class="stil">Daarna nog op <b>Opslaan</b> klikken.</span></div>
+        <div class="breed melding fout" id="fout-nieuw" hidden></div>
+      </form>
+    </section>
+
+    <section class="kaart">
+      <h2>Alle vermeldingen</h2>
+      <div class="raster" style="margin-bottom:12px">
+        <label>Zoeken<input type="search" id="f-zoek" placeholder="titel, bron, link of id"></label>
+        <label>Kanaal<select id="f-kanaal"><option value="">Alle kanalen</option><option>Website</option><option>Instagram</option><option>Facebook</option><option>LinkedIn</option></select></label>
+        <label>Tonen<select id="f-stand"><option value="">Alles</option><option value="zichtbaar">Alleen zichtbaar</option><option value="verborgen">Alleen verborgen</option><option value="handmatig">Alleen handmatig toegevoegd</option><option value="gewijzigd">Alleen niet-opgeslagen wijzigingen</option></select></label>
+      </div>
+      <p class="stil teller" id="teller"></p>
+      <div class="tabelvak">
+        <table>
+          <thead><tr><th>Datum</th><th>Kanaal</th><th class="optioneel">Bron</th><th>Titel</th><th class="optioneel">Id</th><th></th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <p class="stil" id="meer" hidden><button type="button" id="knop-meer">Meer tonen</button></p>
+    </section>
+  </div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  const REPO = 'nieuwenhuis-lgtm/nmdashboard';
+  const PAD = 'data/vermeldingen.json';
+  const TAK = 'main';
+  const OPSLAG = 'nm-beheer-sleutel-v1';
+  const ONDERWERP = 'Week van de Mediawijsheid 2026';
+  const SLOT_NA_MINUTEN = 30;
+  const MAANDEN = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+  const VELDEN = ['id', 'onderwerp', 'datum', 'datum_label', 'kanaal', 'bron', 'titel', 'soort', 'url', 'samenvatting', 'mediamasters', 'hashtags', 'gevonden_op', 'gevonden_op_label', 'afbeelding'];
+
+  const $ = (id) => document.getElementById(id);
+  let token = null;          // alleen in het geheugen, nooit onversleuteld opgeslagen
+  let rijen = [];            // laatst opgehaalde vermeldingen
+  let verbergWijz = new Map(); // id -> true (verbergen) / false (terugzetten)
+  let nieuwe = [];           // nog niet opgeslagen nieuwe vermeldingen (zonder id)
+  let zichtbaarAantal = 100;
+  let slotTimer = null;
+
+  // ---------- Opslag en versleuteling ----------
+  function leesOpslag() { try { const s = localStorage.getItem(OPSLAG); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
+  function schrijfOpslag(v) { try { localStorage.setItem(OPSLAG, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  function wisOpslag() { try { localStorage.removeItem(OPSLAG); } catch (e) {} }
+  const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+  const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+
+  async function sleutelUit(ww, zout, rondes) {
+    const basis = await crypto.subtle.importKey('raw', new TextEncoder().encode(ww), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: zout, iterations: rondes, hash: 'SHA-256' }, basis, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  }
+  async function versleutel(tekst, ww) {
+    const zout = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const rondes = 310000;
+    const k = await sleutelUit(ww, zout, rondes);
+    const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, k, new TextEncoder().encode(tekst));
+    return { v: 1, zout: b64(zout), iv: b64(iv), rondes, data: b64(ct) };
+  }
+  async function ontsleutel(o, ww) {
+    const k = await sleutelUit(ww, unb64(o.zout), o.rondes);
+    const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(o.iv) }, k, unb64(o.data));
+    return new TextDecoder().decode(pt);
+  }
+
+  // ---------- GitHub ----------
+  async function gh(pad, opties) {
+    const r = await fetch('https://api.github.com' + pad, Object.assign({}, opties, {
+      headers: Object.assign({ Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' }, (opties && opties.headers) || {}),
+      cache: 'no-store',
+    }));
+    return r;
+  }
+  async function controleerToken(t) {
+    const oud = token; token = t;
+    try {
+      const r = await gh('/repos/' + REPO);
+      if (r.status === 401) throw new Error('GitHub kent deze sleutel niet (verlopen of verkeerd gekopieerd).');
+      if (r.status === 404) throw new Error('Deze sleutel heeft geen toegang tot ' + REPO + '. Kies bij het aanmaken die repository.');
+      if (!r.ok) throw new Error('GitHub gaf een fout: ' + r.status);
+      const j = await r.json();
+      if (j.permissions && j.permissions.push === false) throw new Error('Deze sleutel mag niet schrijven. Zet bij “Contents” de toegang op “Read and write”.');
+      return true;
+    } finally { token = oud; }
+  }
+  function decodeerUtf8B64(s) {
+    const bin = atob(s.replace(/\n/g, ''));
+    return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)));
+  }
+  function codeerUtf8B64(s) {
+    const bytes = new TextEncoder().encode(s);
+    let bin = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(bin);
+  }
+  async function haalBestand() {
+    const r = await gh('/repos/' + REPO + '/contents/' + PAD + '?ref=' + TAK + '&t=' + Date.now());
+    if (r.status === 401) throw Object.assign(new Error('De GitHub-sleutel werkt niet meer (verlopen of ingetrokken).'), { sleutel: true });
+    if (!r.ok) throw new Error('Kon de lijst niet ophalen (' + r.status + ').');
+    const j = await r.json();
+    let tekst;
+    if (j.content && j.encoding === 'base64') tekst = decodeerUtf8B64(j.content);
+    else {
+      const r2 = await gh('/repos/' + REPO + '/contents/' + PAD + '?ref=' + TAK, { headers: { Accept: 'application/vnd.github.raw+json' } });
+      if (!r2.ok) throw new Error('Kon de lijst niet ophalen (' + r2.status + ').');
+      tekst = await r2.text();
+    }
+    const data = JSON.parse(tekst);
+    if (!Array.isArray(data)) throw new Error('Het bestand heeft een onverwachte vorm.');
+    return { sha: j.sha, data };
+  }
+  // Zelfde opmaak als Python json.dump(..., ensure_ascii=False, indent=0)
+  function naarTekst(lijst) {
+    if (!lijst.length) return '[]';
+    return '[\n' + lijst.map((r) => '{\n' + Object.keys(r).map((k) => JSON.stringify(k) + ': ' + JSON.stringify(r[k])).join(',\n') + '\n}').join(',\n') + '\n]';
+  }
+
+  // ---------- Hulpjes ----------
+  const vandaag = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  const label = (iso) => { if (!iso) return 'zonder datum'; const [j, m, d] = iso.split('-').map(Number); return d + ' ' + MAANDEN[m - 1] + ' ' + j; };
+  const normUrl = (u) => String(u || '').trim().replace(/^http:\/\//i, 'https://').replace(/#.*$/, '').replace(/\/+$/, '').toLowerCase();
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  function voorvoegsel(r) {
+    if (r.kanaal === 'Instagram') return 'i';
+    if (r.kanaal === 'Facebook') return 'f';
+    if (r.kanaal === 'LinkedIn') return 'l';
+    return r.soort === 'Agenda / informatiepagina' ? 'a' : 'w';
+  }
+  function bronUitUrl(u, kanaal) {
+    try {
+      const url = new URL(u);
+      const host = url.hostname.replace(/^www\./, '');
+      if (kanaal !== 'Website') {
+        const deel = url.pathname.split('/').filter(Boolean)[0];
+        if (deel && !['p', 'feed', 'posts', 'reel', 'groups', 'profile.php', 'hashtag', 'in', 'company'].includes(deel)) return deel;
+        return ''; // bij social media de accountnaam zelf laten invullen
+      }
+      return host;
+    } catch (e) { return ''; }
+  }
+  function toonMelding(tekst, soort) {
+    const m = $('melding');
+    m.className = 'melding ' + (soort || 'info');
+    m.innerHTML = tekst;
+    m.hidden = !tekst;
+  }
+  function aantalWijzigingen() { return verbergWijz.size + nieuwe.length; }
+
+  // ---------- Schermen ----------
+  function toon(scherm) {
+    $('scherm-instellen').hidden = scherm !== 'instellen';
+    $('scherm-slot').hidden = scherm !== 'slot';
+    $('scherm-beheer').hidden = scherm !== 'beheer';
+    $('kopknoppen').hidden = scherm !== 'beheer';
+    if (scherm === 'slot') setTimeout(() => $('in-ww').focus(), 0);
+    if (scherm === 'instellen') setTimeout(() => $('in-token').focus(), 0);
+  }
+  function start() {
+    if (!window.crypto || !crypto.subtle) {
+      document.querySelector('main').insertAdjacentHTML('beforeend', '<div class="melding fout">Deze browser ondersteunt de benodigde versleuteling niet. Open de pagina via https in een recente browser.</div>');
+      return;
+    }
+    toon(leesOpslag() ? 'slot' : 'instellen');
+  }
+  function vergrendel(reden) {
+    if (aantalWijzigingen() && reden === 'tijd') { herstartSlotTimer(); return; } // niet vergrendelen met openstaand werk
+    token = null; rijen = []; verbergWijz = new Map(); nieuwe = [];
+    $('in-ww').value = '';
+    clearTimeout(slotTimer);
+    toon('slot');
+    if (reden === 'tijd') { $('fout-slot').textContent = 'Automatisch vergrendeld na ' + SLOT_NA_MINUTEN + ' minuten zonder activiteit.'; $('fout-slot').className = 'breed melding info'; $('fout-slot').hidden = false; }
+  }
+  function herstartSlotTimer() { clearTimeout(slotTimer); if (token) slotTimer = setTimeout(() => vergrendel('tijd'), SLOT_NA_MINUTEN * 60000); }
+  ['click', 'keydown', 'input'].forEach((ev) => document.addEventListener(ev, herstartSlotTimer, { passive: true }));
+
+  $('form-instellen').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fout = $('fout-instellen'); fout.hidden = true;
+    const t = $('in-token').value.trim(), w1 = $('in-ww1').value, w2 = $('in-ww2').value;
+    if (w1 !== w2) { fout.textContent = 'De twee wachtwoorden zijn niet gelijk.'; fout.hidden = false; return; }
+    const knop = e.submitter || e.target.querySelector('button'); knop.disabled = true; knop.textContent = 'Controleren…';
+    try {
+      await controleerToken(t);
+      const o = await versleutel(t, w1);
+      const bewaard = schrijfOpslag(o);
+      token = t;
+      $('in-token').value = ''; $('in-ww1').value = ''; $('in-ww2').value = '';
+      await openBeheer();
+      if (!bewaard) toonMelding('Deze browser staat opslaan niet toe (privévenster?). De sleutel werkt nu wel, maar alleen tot je de pagina sluit.', 'fout');
+    } catch (err) { fout.textContent = err.message; fout.hidden = false; }
+    finally { knop.disabled = false; knop.textContent = 'Opslaan en openen'; }
+  });
+
+  $('form-slot').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fout = $('fout-slot'); fout.hidden = true; fout.className = 'breed melding fout';
+    const o = leesOpslag();
+    if (!o) { toon('instellen'); return; }
+    const knop = e.submitter || e.target.querySelector('button'); knop.disabled = true; knop.textContent = 'Openen…';
+    try {
+      token = await ontsleutel(o, $('in-ww').value);
+    } catch (err) {
+      fout.textContent = 'Wachtwoord klopt niet.'; fout.hidden = false;
+      knop.disabled = false; knop.textContent = 'Openen'; return;
+    }
+    $('in-ww').value = '';
+    knop.disabled = false; knop.textContent = 'Openen';
+    await openBeheer();
+  });
+
+  $('knop-wis').addEventListener('click', () => {
+    if (!confirm('De versleutelde GitHub-sleutel van dit apparaat wissen? Je moet daarna opnieuw een sleutel plakken en een wachtwoord kiezen.')) return;
+    wisOpslag(); token = null; $('fout-slot').hidden = true; toon('instellen');
+  });
+  $('knop-vergrendel').addEventListener('click', () => {
+    if (aantalWijzigingen() && !confirm('Er zijn niet-opgeslagen wijzigingen. Toch vergrendelen? De wijzigingen gaan dan verloren.')) return;
+    vergrendel('knop');
+  });
+  window.addEventListener('beforeunload', (e) => { if (aantalWijzigingen()) { e.preventDefault(); e.returnValue = ''; } });
+
+  // ---------- Beheer ----------
+  async function openBeheer() {
+    toon('beheer');
+    herstartSlotTimer();
+    await herlaad();
+  }
+  async function herlaad() {
+    $('status').textContent = 'Laden…';
+    try {
+      const b = await haalBestand();
+      rijen = b.data;
+      toonMelding('');
+      teken();
+    } catch (err) {
+      $('status').textContent = 'Laden mislukt.';
+      toonMelding(esc(err.message) + (err.sleutel ? ' Klik op <b>Vergrendelen</b>, kies “Sleutel van dit apparaat wissen” en stel een nieuwe sleutel in.' : ''), 'fout');
+    }
+  }
+
+  function teken() {
+    const n = aantalWijzigingen();
+    const aantalVerb = rijen.filter((r) => r.verborgen === true).length;
+    $('status').innerHTML = '<span class="teller">' + rijen.length + '</span> vermeldingen, waarvan <span class="teller">' + aantalVerb + '</span> verborgen' +
+      (n ? ' · <b style="color:var(--warn)">' + n + ' niet-opgeslagen wijziging' + (n === 1 ? '' : 'en') + '</b>' : '');
+    $('knop-opslaan').disabled = !n;
+    $('knop-ongedaan').disabled = !n;
+    $('knop-opslaan').textContent = n ? 'Opslaan (' + n + ')' : 'Opslaan';
+
+    const zoek = $('f-zoek').value.trim().toLowerCase();
+    const kanaal = $('f-kanaal').value;
+    const stand = $('f-stand').value;
+    const alle = nieuwe.map((r, i) => Object.assign({}, r, { _nieuw: i })).concat(rijen.slice().sort((a, b) => String(b.datum || '').localeCompare(String(a.datum || '')) || String(b.gevonden_op || '').localeCompare(String(a.gevonden_op || ''))));
+    const lijst = alle.filter((r) => {
+      const verb = verbergWijz.has(r.id) ? verbergWijz.get(r.id) : r.verborgen === true;
+      if (kanaal && r.kanaal !== kanaal) return false;
+      if (stand === 'zichtbaar' && verb) return false;
+      if (stand === 'verborgen' && !verb) return false;
+      if (stand === 'handmatig' && !(r.handmatig === true || r._nieuw !== undefined)) return false;
+      if (stand === 'gewijzigd' && !(verbergWijz.has(r.id) || r._nieuw !== undefined)) return false;
+      if (zoek && ![r.titel, r.bron, r.url, r.id, r.samenvatting].some((x) => String(x || '').toLowerCase().includes(zoek))) return false;
+      return true;
+    });
+    $('teller').textContent = lijst.length === alle.length ? lijst.length + ' vermeldingen' : lijst.length + ' van ' + alle.length + ' vermeldingen';
+    const html = lijst.slice(0, zichtbaarAantal).map((r) => {
+      const isNieuw = r._nieuw !== undefined;
+      const verb = verbergWijz.has(r.id) ? verbergWijz.get(r.id) : r.verborgen === true;
+      const gewijzigd = isNieuw || verbergWijz.has(r.id);
+      const labels = (isNieuw ? '<span class="label nieuw">nieuw, nog niet opgeslagen</span>' : '') +
+        (verb ? '<span class="label verb">verborgen</span>' : '') +
+        (r.handmatig === true ? '<span class="label hand">handmatig</span>' : '') +
+        (r.mediamasters === true ? '<span class="label mm">MediaMasters</span>' : '');
+      const knop = isNieuw
+        ? '<button type="button" class="klein" data-schrap="' + r._nieuw + '">Schrappen</button>'
+        : (verb ? '<button type="button" class="klein" data-toon="' + esc(r.id) + '">Terugzetten</button>'
+                : '<button type="button" class="klein" data-verberg="' + esc(r.id) + '">Verbergen</button>');
+      return '<tr class="' + (verb ? 'verborgen ' : '') + (gewijzigd ? 'gewijzigd' : '') + '">' +
+        '<td class="nw">' + esc(r.datum_label || label(r.datum)) + '</td>' +
+        '<td class="nw">' + esc(r.kanaal) + '</td>' +
+        '<td class="optioneel">' + esc(r.bron) + '</td>' +
+        '<td class="titel"><a href="' + esc(r.url) + '" target="_blank" rel="noopener noreferrer">' + esc(r.titel || r.url) + '</a>' +
+          (r.samenvatting ? '<div class="sam">' + esc(r.samenvatting) + '</div>' : '') + '<div>' + labels + '</div></td>' +
+        '<td class="optioneel nw">' + esc(isNieuw ? '—' : r.id) + '</td>' +
+        '<td class="actie nw">' + knop + '</td></tr>';
+    }).join('');
+    $('tbody').innerHTML = html || '<tr><td colspan="6" class="stil">Niets gevonden.</td></tr>';
+    $('meer').hidden = lijst.length <= zichtbaarAantal;
+  }
+
+  $('tbody').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.verberg) zetVerborgen(b.dataset.verberg, true);
+    else if (b.dataset.toon) zetVerborgen(b.dataset.toon, false);
+    else if (b.dataset.schrap !== undefined) { nieuwe.splice(Number(b.dataset.schrap), 1); teken(); }
+  });
+  function zetVerborgen(id, waarde) {
+    const r = rijen.find((x) => x.id === id); if (!r) return;
+    const huidig = r.verborgen === true;
+    if (huidig === waarde) verbergWijz.delete(id); else verbergWijz.set(id, waarde);
+    teken();
+  }
+  ['f-zoek', 'f-kanaal', 'f-stand'].forEach((id) => $(id).addEventListener('input', () => { zichtbaarAantal = 100; teken(); }));
+  $('knop-meer').addEventListener('click', () => { zichtbaarAantal += 200; teken(); });
+  $('knop-ongedaan').addEventListener('click', () => {
+    if (!confirm('Alle niet-opgeslagen wijzigingen weggooien?')) return;
+    verbergWijz = new Map(); nieuwe = []; toonMelding(''); teken();
+  });
+
+  // Kanaal kiest een passende soort
+  $('n-kanaal').addEventListener('change', () => {
+    const k = $('n-kanaal').value;
+    if (k !== 'Website' && $('n-soort').value !== 'Doorplaatsing') $('n-soort').value = 'Social post';
+    if (k === 'Website' && $('n-soort').value === 'Social post') $('n-soort').value = 'Nieuws';
+    $('n-beeld').disabled = k !== 'Website';
+  });
+  $('n-url').addEventListener('change', () => {
+    const u = $('n-url').value.trim();
+    const h = (() => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return ''; } })();
+    const kanaal = /(^|\.)instagram\.com$/.test(h) ? 'Instagram' : /(^|\.)facebook\.com$|(^|\.)fb\.com$/.test(h) ? 'Facebook' : /(^|\.)linkedin\.com$/.test(h) ? 'LinkedIn' : 'Website';
+    $('n-kanaal').value = kanaal; $('n-kanaal').dispatchEvent(new Event('change'));
+    if (!$('n-bron').value) $('n-bron').value = bronUitUrl(u, kanaal);
+  });
+
+  $('form-nieuw').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fout = $('fout-nieuw'); fout.hidden = true;
+    const url = $('n-url').value.trim();
+    if (!/^https:\/\//i.test(url)) { fout.textContent = 'De link moet met https:// beginnen.'; fout.hidden = false; return; }
+    const dubbel = rijen.concat(nieuwe).find((r) => normUrl(r.url) === normUrl(url));
+    if (dubbel) { fout.textContent = 'Deze link staat al in de lijst' + (dubbel.id ? ' (' + dubbel.id + (dubbel.verborgen ? ', verborgen' : '') + ')' : '') + '.'; fout.hidden = false; return; }
+    const kanaal = $('n-kanaal').value;
+    if (kanaal !== 'Website' && !$('n-bron').value.trim() && !bronUitUrl(url, kanaal)) { fout.textContent = 'Vul bij Bron de naam van het account in (bijvoorbeeld de school of bibliotheek).'; fout.hidden = false; $('n-bron').focus(); return; }
+    const datum = $('n-datum').value || null;
+    const beeld = $('n-beeld').value.trim();
+    if (beeld && !/^https:\/\//i.test(beeld)) { fout.textContent = 'De afbeeldingslink moet met https:// beginnen.'; fout.hidden = false; return; }
+    const tags = $('n-tags').value.trim().toLowerCase().split(/[\s,]+/).filter(Boolean).map((t) => (t[0] === '#' || t[0] === '@') ? t : '#' + t).join(' ');
+    const v = vandaag();
+    nieuwe.unshift({
+      onderwerp: ONDERWERP,
+      datum,
+      datum_label: label(datum),
+      kanaal,
+      bron: $('n-bron').value.trim() || bronUitUrl(url, kanaal),
+      titel: $('n-titel').value.trim(),
+      soort: $('n-soort').value,
+      url,
+      samenvatting: $('n-sam').value.trim(),
+      mediamasters: $('n-mm').checked,
+      hashtags: tags,
+      gevonden_op: v,
+      gevonden_op_label: label(v),
+      afbeelding: kanaal === 'Website' ? beeld : '',
+      handmatig: true,
+    });
+    e.target.reset(); $('n-beeld').disabled = false;
+    toonMelding('Toegevoegd aan de lijst. Klik op <b>Opslaan</b> om het op het dashboard te zetten.', 'info');
+    teken();
+  });
+
+  // ---------- Opslaan ----------
+  $('knop-opslaan').addEventListener('click', async () => {
+    const knop = $('knop-opslaan'); knop.disabled = true; knop.textContent = 'Opslaan…';
+    toonMelding('');
+    for (let poging = 1; poging <= 3; poging++) {
+      try {
+        const b = await haalBestand(); // altijd de nieuwste versie als basis, zodat niets van de zoekronde verloren gaat
+        const data = b.data;
+        let verborgen = 0, teruggezet = 0;
+        verbergWijz.forEach((waarde, id) => {
+          const r = data.find((x) => x.id === id); if (!r) return;
+          if (waarde) { if (r.verborgen !== true) { r.verborgen = true; verborgen++; } }
+          else if (r.verborgen === true) { delete r.verborgen; teruggezet++; }
+        });
+        const hoogste = {};
+        data.forEach((r) => { const m = /^([a-z]+)(\d+)$/.exec(r.id || ''); if (m) hoogste[m[1]] = Math.max(hoogste[m[1]] || 0, Number(m[2])); });
+        const bekend = new Set(data.map((r) => normUrl(r.url)));
+        let toegevoegd = 0;
+        nieuwe.slice().reverse().forEach((n) => {
+          if (bekend.has(normUrl(n.url))) return;
+          const p = voorvoegsel(n);
+          const nr = (hoogste[p] || 0) + 1; hoogste[p] = nr;
+          const r = { id: p + String(nr).padStart(2, '0') };
+          VELDEN.slice(1).forEach((k) => { r[k] = n[k]; });
+          r.handmatig = true;
+          data.push(r); bekend.add(normUrl(n.url)); toegevoegd++;
+        });
+        if (!verborgen && !teruggezet && !toegevoegd) {
+          verbergWijz = new Map(); nieuwe = []; rijen = data; teken();
+          toonMelding('Er was niets te wijzigen: de lijst was al zo.', 'info');
+          return;
+        }
+        const delen = [];
+        if (toegevoegd) delen.push(toegevoegd + ' toegevoegd');
+        if (verborgen) delen.push(verborgen + ' verborgen');
+        if (teruggezet) delen.push(teruggezet + ' teruggezet');
+        const r = await gh('/repos/' + REPO + '/contents/' + PAD, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'Beheer: ' + delen.join(', '), content: codeerUtf8B64(naarTekst(data)), sha: b.sha, branch: TAK }),
+        });
+        if (r.status === 409 || r.status === 422) { if (poging < 3) continue; throw new Error('De lijst werd tegelijk ergens anders gewijzigd. Probeer het zo nog eens.'); }
+        if (r.status === 401) throw new Error('De GitHub-sleutel werkt niet meer (verlopen of ingetrokken).');
+        if (r.status === 403 || r.status === 404) throw new Error('Deze sleutel mag niet schrijven in ' + REPO + ' (' + r.status + ').');
+        if (!r.ok) throw new Error('Opslaan mislukt (' + r.status + ').');
+        verbergWijz = new Map(); nieuwe = []; rijen = data;
+        teken();
+        toonMelding('Opgeslagen: ' + delen.join(', ') + '. Het dashboard toont dit binnen een paar minuten.', 'goed');
+        return;
+      } catch (err) {
+        toonMelding(esc(err.message), 'fout');
+        teken();
+        return;
+      }
+    }
+  });
+
+  start();
+})();
+</script>
+</body>
+</html>

@@ -32,6 +32,8 @@
       .then((d) => s.type === 'dataurl'
         ? new Promise((res) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(d); })
         : d)
+      // Vermeldingen die via de beheerpagina zijn verborgen, telt en toont het dashboard niet.
+      .then((d) => (Array.isArray(d) ? d.filter((r) => !(r && r.verborgen === true)) : d))
       .then((d) => { store[id] = { status: 'ok', data: d, bijgewerkt }; redraw(); })
       .catch((e) => { if (!force) { store[id] = { status: 'error', data: [], message: String(e) }; redraw(); } });
   }
